@@ -33,7 +33,7 @@ export class UsuariosService {
         apellido: datos.apellido,
         telefono: datos.telefono,
         rol: datos.rol,
-        especialidad: datos.especialidad || undefined,
+        ...(datos.especialidad && { especialidad: datos.especialidad }),  // ← CAMBIO AQUÍ
         fechaRegistro: new Date(),
         activo: true
       };

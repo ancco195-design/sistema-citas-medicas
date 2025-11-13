@@ -1,0 +1,228 @@
+<div class="contenedor-registro">
+  <div class="tarjeta-registro">
+    
+    <!-- Encabezado -->
+    <div class="encabezado-registro">
+      <div class="icono-medico">🏥</div>
+      <h1>Crear Cuenta</h1>
+      <p>Regístrate en el Sistema de Citas Médicas</p>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngIf="mensajeError" class="alerta-error">
+      <span>⚠️ {{ mensajeError }}</span>
+    </div>
+
+    <div *ngIf="mensajeExito" class="alerta-exito">
+      <span>✅ {{ mensajeExito }}</span>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="formularioRegistro" (ngSubmit)="onSubmit()">
+      
+      <!-- Selección de Rol -->
+      <div class="grupo-formulario">
+        <label>Tipo de Usuario</label>
+        <div class="selector-rol">
+          <label class="opcion-rol" [class.activa]="formularioRegistro.get('rol')?.value === 'paciente'">
+            <input type="radio" formControlName="rol" value="paciente">
+            <span>👤 Paciente</span>
+          </label>
+          <label class="opcion-rol" [class.activa]="formularioRegistro.get('rol')?.value === 'doctor'">
+            <input type="radio" formControlName="rol" value="doctor">
+            <span>👨‍⚕️ Doctor</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Datos Personales -->
+      <div class="fila-formulario">
+        <div class="grupo-formulario">
+          <label for="nombre">Nombre *</label>
+          <input 
+            type="text" 
+            id="nombre"
+            formControlName="nombre"
+            placeholder="Juan"
+            [class.error]="formularioRegistro.get('nombre')?.invalid && formularioRegistro.get('nombre')?.touched"
+          >
+          <span class="mensaje-error" *ngIf="formularioRegistro.get('nombre')?.invalid && formularioRegistro.get('nombre')?.touched">
+            {{ obtenerMensajeError('nombre') }}
+          </span>
+        </div>
+
+        <div class="grupo-formulario">
+          <label for="apellido">Apellido *</label>
+          <input 
+            type="text" 
+            id="apellido"
+            formControlName="apellido"
+            placeholder="Pérez"
+            [class.error]="formularioRegistro.get('apellido')?.invalid && formularioRegistro.get('apellido')?.touched"
+          >
+          <span class="mensaje-error" *ngIf="formularioRegistro.get('apellido')?.invalid && formularioRegistro.get('apellido')?.touched">
+            {{ obtenerMensajeError('apellido') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="grupo-formulario">
+        <label for="email">Correo Electrónico *</label>
+        <input 
+          type="email" 
+          id="email"
+          formControlName="email"
+          placeholder="ejemplo@correo.com"
+          [class.error]="formularioRegistro.get('email')?.invalid && formularioRegistro.get('email')?.touched"
+        >
+        <span class="mensaje-error" *ngIf="formularioRegistro.get('email')?.invalid && formularioRegistro.get('email')?.touched">
+          {{ obtenerMensajeError('email') }}
+        </span>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="grupo-formulario">
+        <label for="telefono">Teléfono *</label>
+        <input 
+          type="tel" 
+          id="telefono"
+          formControlName="telefono"
+          placeholder="987654321"
+          maxlength="9"
+          [class.error]="formularioRegistro.get('telefono')?.invalid && formularioRegistro.get('telefono')?.touched"
+        >
+        <span class="mensaje-error" *ngIf="formularioRegistro.get('telefono')?.invalid && formularioRegistro.get('telefono')?.touched">
+          {{ obtenerMensajeError('telefono') }}
+        </span>
+      </div>
+
+      <!-- Campos adicionales para Doctor -->
+      <div *ngIf="esDoctor" class="seccion-doctor">
+        
+        <h3>Información Profesional</h3>
+
+        <div class="grupo-formulario">
+          <label for="especialidad">Especialidad *</label>
+          <select 
+            id="especialidad"
+            formControlName="especialidad"
+            [class.error]="formularioRegistro.get('especialidad')?.invalid && formularioRegistro.get('especialidad')?.touched"
+          >
+            <option value="">Seleccione una especialidad</option>
+            <option *ngFor="let esp of especialidades" [value]="esp.nombre">
+              {{ esp.icono }} {{ esp.nombre }}
+            </option>
+          </select>
+          <span class="mensaje-error" *ngIf="formularioRegistro.get('especialidad')?.invalid && formularioRegistro.get('especialidad')?.touched">
+            {{ obtenerMensajeError('especialidad') }}
+          </span>
+        </div>
+
+        <div class="fila-formulario">
+          <div class="grupo-formulario">
+            <label for="consultorio">Consultorio *</label>
+            <input 
+              type="text" 
+              id="consultorio"
+              formControlName="consultorio"
+              placeholder="Consultorio 101"
+              [class.error]="formularioRegistro.get('consultorio')?.invalid && formularioRegistro.get('consultorio')?.touched"
+            >
+            <span class="mensaje-error" *ngIf="formularioRegistro.get('consultorio')?.invalid && formularioRegistro.get('consultorio')?.touched">
+              {{ obtenerMensajeError('consultorio') }}
+            </span>
+          </div>
+
+          <div class="grupo-formulario">
+            <label for="añosExperiencia">Años de Experiencia *</label>
+            <input 
+              type="number" 
+              id="añosExperiencia"
+              formControlName="añosExperiencia"
+              placeholder="5"
+              min="0"
+              [class.error]="formularioRegistro.get('añosExperiencia')?.invalid && formularioRegistro.get('añosExperiencia')?.touched"
+            >
+            <span class="mensaje-error" *ngIf="formularioRegistro.get('añosExperiencia')?.invalid && formularioRegistro.get('añosExperiencia')?.touched">
+              {{ obtenerMensajeError('añosExperiencia') }}
+            </span>
+          </div>
+        </div>
+
+        <div class="grupo-formulario">
+          <label for="biografia">Biografía Profesional *</label>
+          <textarea 
+            id="biografia"
+            formControlName="biografia"
+            placeholder="Describe tu experiencia profesional, especialización y enfoque médico..."
+            rows="4"
+            [class.error]="formularioRegistro.get('biografia')?.invalid && formularioRegistro.get('biografia')?.touched"
+          ></textarea>
+          <span class="mensaje-error" *ngIf="formularioRegistro.get('biografia')?.invalid && formularioRegistro.get('biografia')?.touched">
+            {{ obtenerMensajeError('biografia') }}
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Contraseñas -->
+      <div class="grupo-formulario">
+        <label for="password">Contraseña *</label>
+        <div class="input-password">
+          <input 
+            [type]="mostrarPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.error]="formularioRegistro.get('password')?.invalid && formularioRegistro.get('password')?.touched"
+          >
+          <button 
+            type="button" 
+            class="btn-toggle-password"
+            (click)="togglePassword()"
+          >
+            {{ mostrarPassword ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+        <span class="mensaje-error" *ngIf="formularioRegistro.get('password')?.invalid && formularioRegistro.get('password')?.touched">
+          {{ obtenerMensajeError('password') }}
+        </span>
+      </div>
+
+      <div class="grupo-formulario">
+        <label for="confirmarPassword">Confirmar Contraseña *</label>
+        <input 
+          [type]="mostrarPassword ? 'text' : 'password'"
+          id="confirmarPassword"
+          formControlName="confirmarPassword"
+          placeholder="••••••••"
+          [class.error]="(formularioRegistro.get('confirmarPassword')?.invalid && formularioRegistro.get('confirmarPassword')?.touched) || (!passwordsCoinciden() && formularioRegistro.get('confirmarPassword')?.touched)"
+        >
+        <span class="mensaje-error" *ngIf="!passwordsCoinciden() && formularioRegistro.get('confirmarPassword')?.touched">
+          Las contraseñas no coinciden
+        </span>
+      </div>
+
+      <!-- Botón Submit -->
+      <button 
+        type="submit" 
+        class="btn-primary"
+        [disabled]="cargando"
+      >
+        <span *ngIf="!cargando">Registrarse</span>
+        <span *ngIf="cargando">Registrando...</span>
+      </button>
+
+    </form>
+
+    <!-- Link a Login -->
+    <div class="pie-formulario">
+      <p>
+        ¿Ya tienes una cuenta? 
+        <a routerLink="/autenticacion/inicio-sesion">Inicia sesión aquí</a>
+      </p>
+    </div>
+
+  </div>
+</div>
