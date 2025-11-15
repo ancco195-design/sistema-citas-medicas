@@ -1,1 +1,96 @@
-<p>navbar works!</p>
+<nav class="navbar">
+  <div class="navbar-contenedor">
+    
+    <!-- Logo y Título -->
+    <div class="navbar-marca">
+      <span class="navbar-icono">🏥</span>
+      <span class="navbar-titulo">Sistema de Citas Médicas</span>
+    </div>
+
+    <!-- Menú Desktop -->
+    <div class="navbar-menu" [class.mostrar]="mostrarMenuMovil">
+      <a 
+        *ngFor="let enlace of enlacesMenu"
+        [routerLink]="enlace.ruta"
+        routerLinkActive="activo"
+        class="navbar-enlace"
+        (click)="mostrarMenuMovil = false"
+      >
+        <span class="enlace-icono">{{ enlace.icono }}</span>
+        <span>{{ enlace.texto }}</span>
+      </a>
+    </div>
+
+    <!-- Usuario y Menú -->
+    <div class="navbar-usuario">
+      
+      <!-- Badge del Rol -->
+      <div class="usuario-rol">
+        {{ rolBadge }}
+      </div>
+
+      <!-- Botón de Usuario -->
+      <div class="usuario-dropdown">
+        <button 
+          class="usuario-boton"
+          (click)="toggleMenuUsuario()"
+        >
+          <div class="usuario-avatar">
+            {{ usuario?.nombre?.charAt(0) || 'U' }}
+          </div>
+          <span class="usuario-nombre">{{ nombreCompleto }}</span>
+          <span class="usuario-flecha">▼</span>
+        </button>
+
+        <!-- Menú Desplegable -->
+        <div class="dropdown-menu" *ngIf="mostrarMenuUsuario">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">
+              {{ usuario?.nombre?.charAt(0) || 'U' }}
+            </div>
+            <div class="dropdown-info">
+              <p class="dropdown-nombre">{{ nombreCompleto }}</p>
+              <p class="dropdown-email">{{ usuario?.email }}</p>
+            </div>
+          </div>
+          
+          <div class="dropdown-divider"></div>
+          
+          <a class="dropdown-item" [routerLink]="'/perfil'">
+            <span>👤</span>
+            <span>Mi Perfil</span>
+          </a>
+          
+          <a class="dropdown-item" [routerLink]="'/configuracion'">
+            <span>⚙️</span>
+            <span>Configuración</span>
+          </a>
+          
+          <div class="dropdown-divider"></div>
+          
+          <button class="dropdown-item cerrar-sesion" (click)="cerrarSesion()">
+            <span>🚪</span>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón Menú Móvil -->
+      <button 
+        class="menu-movil-toggle"
+        (click)="toggleMenuMovil()"
+      >
+        <span class="hamburguesa">☰</span>
+      </button>
+
+    </div>
+
+  </div>
+</nav>
+
+<!-- Overlay para cerrar menús -->
+<div 
+  class="navbar-overlay" 
+  *ngIf="mostrarMenuUsuario || mostrarMenuMovil"
+  (click)="mostrarMenuUsuario = false; mostrarMenuMovil = false"
+></div>

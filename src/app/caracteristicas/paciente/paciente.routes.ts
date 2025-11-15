@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { InicioPaciente } from './inicio-paciente/inicio-paciente';
+import { InicioPaciente} from './inicio-paciente/inicio-paciente';
 import { ListaDoctores } from './lista-doctores/lista-doctores';
 import { AgendarCita } from './agendar-cita/agendar-cita';
-import { MisCitas } from './mis-citas/mis-citas';
-import { DetalleDoctor } from './detalle-doctor/detalle-doctor';
+import { MisCitas} from './mis-citas/mis-citas';
+import { DetalleDoctor} from './detalle-doctor/detalle-doctor';
 
 /**
  * Rutas del módulo de Paciente

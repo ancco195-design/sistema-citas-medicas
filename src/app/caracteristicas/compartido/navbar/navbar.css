@@ -1,0 +1,302 @@
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: white;
+}
+
+.navbar-contenedor {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+/* Logo y Marca */
+.navbar-marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.navbar-icono {
+  font-size: 32px;
+}
+
+.navbar-titulo {
+  display: none;
+}
+
+/* Menú de Navegación */
+.navbar-menu {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar-enlace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.navbar-enlace:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-enlace.activo {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.enlace-icono {
+  font-size: 18px;
+}
+
+/* Usuario */
+.navbar-usuario {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.usuario-rol {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usuario-dropdown {
+  position: relative;
+}
+
+.usuario-boton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.usuario-boton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.usuario-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: white;
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.usuario-nombre {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.usuario-flecha {
+  font-size: 10px;
+  transition: transform 0.3s;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  min-width: 280px;
+  padding: 10px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+
+.dropdown-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.dropdown-info {
+  flex: 1;
+}
+
+.dropdown-nombre {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  font-size: 15px;
+}
+
+.dropdown-email {
+  color: #666;
+  margin: 4px 0 0 0;
+  font-size: 13px;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 8px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 14px;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+.dropdown-item.cerrar-sesion {
+  color: #f44336;
+}
+
+.dropdown-item.cerrar-sesion:hover {
+  background: #fee;
+}
+
+/* Menú Móvil */
+.menu-movil-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.navbar-overlay {
+  display: none;
+}
+
+/* Responsivo */
+@media (min-width: 768px) {
+  .navbar-titulo {
+    display: block;
+  }
+}
+
+@media (max-width: 1024px) {
+  .usuario-nombre {
+    display: none;
+  }
+
+  .usuario-rol {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-menu {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    flex-direction: column;
+    padding: 20px;
+    gap: 5px;
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar-menu.mostrar {
+    transform: translateX(0);
+  }
+
+  .navbar-enlace {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .menu-movil-toggle {
+    display: block;
+  }
+
+  .navbar-overlay {
+    display: block;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .dropdown-menu {
+    right: -10px;
+  }
+}
