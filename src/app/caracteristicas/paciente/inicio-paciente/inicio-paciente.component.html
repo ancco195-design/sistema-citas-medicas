@@ -1,0 +1,140 @@
+<!-- Navbar -->
+<app-navbar></app-navbar>
+
+<div class="contenedor-principal">
+  <div class="contenido">
+
+    <!-- Loader -->
+    <section *ngIf="cargando" class="cargando">
+      <div class="spinner"></div>
+      <p>Cargando información...</p>
+    </section>
+
+    <!-- Dashboard -->
+    <section *ngIf="!cargando">
+
+      <!-- Encabezado de bienvenida -->
+      <header class="encabezado-bienvenida">
+        <div class="bienvenida-texto">
+          <h1>{{ saludo }}, {{ usuario?.nombre }}! 👋</h1>
+          <p>Bienvenido a tu panel de gestión de citas médicas</p>
+        </div>
+
+        <button class="btn-primary" (click)="navegarAgendarCita()">
+          📅 Agendar Cita
+        </button>
+      </header>
+
+      <!-- Tarjetas de Resumen -->
+      <section class="tarjetas-resumen">
+
+        <article class="tarjeta-resumen tarjeta-pendientes">
+          <div class="tarjeta-icono">📋</div>
+          <div class="tarjeta-info">
+            <h3>{{ citasPendientes.length }}</h3>
+            <p>Citas Pendientes</p>
+          </div>
+        </article>
+
+        <article class="tarjeta-resumen tarjeta-doctores clickable" (click)="navegarDoctores()">
+          <div class="tarjeta-icono">👨‍⚕️</div>
+          <div class="tarjeta-info">
+            <h3>{{ totalDoctores }}</h3>
+            <p>Doctores Disponibles</p>
+          </div>
+        </article>
+
+        <article class="tarjeta-resumen tarjeta-acceso clickable" (click)="navegarMisCitas()">
+          <div class="tarjeta-icono">📅</div>
+          <div class="tarjeta-info">
+            <h3>Ver Todas</h3>
+            <p>Mis Citas</p>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Próximas Citas -->
+      <section class="seccion-proximas-citas">
+
+        <div class="seccion-header">
+          <h2>📅 Próximas Citas</h2>
+          <a routerLink="/paciente/mis-citas" class="link-ver-mas">Ver todas →</a>
+        </div>
+
+        <!-- Sin Citas -->
+        <div *ngIf="proximasCitas.length === 0" class="sin-citas">
+          <div class="sin-citas-icono">📭</div>
+          <h3>No tienes citas programadas</h3>
+          <p>Agenda tu primera cita con un especialista</p>
+          <button class="btn-secondary" (click)="navegarAgendarCita()">Buscar Doctores</button>
+        </div>
+
+        <!-- Con citas -->
+        <div *ngIf="proximasCitas.length > 0" class="lista-citas">
+
+          <article *ngFor="let cita of proximasCitas" class="tarjeta-cita">
+
+            <!-- Fecha -->
+            <div class="cita-fecha">
+              <span class="fecha-dia">{{ cita.fecha | date:'dd' }}</span>
+              <span class="fecha-mes">{{ cita.fecha | date:'MMM' }}</span>
+            </div>
+
+            <!-- Info -->
+            <div class="cita-info">
+              <h3>Dr. {{ cita.doctorNombre }}</h3>
+              <p class="cita-especialidad">{{ cita.especialidad }}</p>
+              <p class="cita-hora">🕐 {{ cita.hora }}</p>
+              <p class="cita-motivo">{{ cita.motivo }}</p>
+            </div>
+
+            <!-- Estado -->
+            <div class="cita-acciones">
+              <span class="badge-estado" [ngClass]="obtenerClaseEstado(cita.estado)">
+                {{ obtenerBadgeEstado(cita.estado) }}
+              </span>
+            </div>
+
+          </article>
+
+        </div>
+
+      </section>
+
+      <!-- Acciones rápidas -->
+      <section class="seccion-acciones-rapidas">
+        <h2>⚡ Acciones Rápidas</h2>
+
+        <div class="grid-acciones">
+
+          <article class="tarjeta-accion clickable" (click)="navegarDoctores()">
+            <div class="accion-icono">🔍</div>
+            <h3>Buscar Doctores</h3>
+            <p>Encuentra especialistas por área</p>
+          </article>
+
+          <article class="tarjeta-accion clickable" (click)="navegarMisCitas()">
+            <div class="accion-icono">📋</div>
+            <h3>Mis Citas</h3>
+            <p>Revisa tu historial</p>
+          </article>
+
+          <article class="tarjeta-accion clickable" routerLink="/paciente/perfil">
+            <div class="accion-icono">👤</div>
+            <h3>Mi Perfil</h3>
+            <p>Actualiza tu información personal</p>
+          </article>
+
+          <article class="tarjeta-accion clickable" routerLink="/ayuda">
+            <div class="accion-icono">❓</div>
+            <h3>Ayuda</h3>
+            <p>¿Necesitas asistencia?</p>
+          </article>
+
+        </div>
+      </section>
+
+    </section>
+  </div>
+</div>

@@ -13,8 +13,8 @@ import { Usuario } from '../../../nucleo/modelos/usuario.model';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
-  templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
   private autenticacionService = inject(AutenticacionService);

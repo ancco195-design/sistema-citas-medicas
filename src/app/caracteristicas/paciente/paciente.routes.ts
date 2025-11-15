@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { InicioPaciente} from './inicio-paciente/inicio-paciente';
+import { InicioPacienteComponent} from './inicio-paciente/inicio-paciente.component';
 import { ListaDoctores } from './lista-doctores/lista-doctores';
 import { AgendarCita } from './agendar-cita/agendar-cita';
 import { MisCitas} from './mis-citas/mis-citas';
@@ -17,7 +17,7 @@ export const PACIENTE_ROUTES: Routes = [
   },
   {
     path: 'inicio',
-    component: InicioPaciente,
+    component: InicioPacienteComponent,
     title: 'Inicio - Paciente'
   },
   {
