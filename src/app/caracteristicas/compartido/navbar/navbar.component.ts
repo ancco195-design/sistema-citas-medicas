@@ -24,38 +24,36 @@ export class NavbarComponent implements OnInit {
   usuario: Usuario | null = null;
   mostrarMenuUsuario = false;
   mostrarMenuMovil = false;
+  enlacesMenu: any[] = [];
+  nombreCompleto = 'Usuario';
+  rolBadge = '';
 
-  async ngOnInit() {
-    await this.cargarUsuario();
+  ngOnInit() {
+    this.cargarUsuario();
   }
 
   /**
    * Cargar datos del usuario actual
    */
-  async cargarUsuario() {
+  cargarUsuario() {
     const uid = this.autenticacionService.obtenerUid();
     if (uid) {
-      this.usuario = await this.usuariosService.obtenerUsuario(uid);
+      this.usuariosService.obtenerUsuario(uid).then(usuario => {
+        this.usuario = usuario;
+        if (usuario) {
+          this.nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
+          this.rolBadge = this.obtenerRolBadge(usuario.rol);
+          this.enlacesMenu = this.obtenerEnlacesMenu(usuario.rol);
+        }
+      });
     }
-  }
-
-  /**
-   * Obtener nombre completo del usuario
-   */
-  get nombreCompleto(): string {
-    if (this.usuario) {
-      return `${this.usuario.nombre} ${this.usuario.apellido}`;
-    }
-    return 'Usuario';
   }
 
   /**
    * Obtener enlaces del menú según el rol
    */
-  get enlacesMenu(): any[] {
-    if (!this.usuario) return [];
-
-    switch (this.usuario.rol) {
+  obtenerEnlacesMenu(rol: string): any[] {
+    switch (rol) {
       case 'paciente':
         return [
           { ruta: '/paciente/inicio', texto: 'Inicio', icono: '🏠' },
@@ -84,6 +82,22 @@ export class NavbarComponent implements OnInit {
   }
 
   /**
+   * Obtener badge del rol
+   */
+  obtenerRolBadge(rol: string): string {
+    switch (rol) {
+      case 'paciente':
+        return '👤 Paciente';
+      case 'doctor':
+        return '👨‍⚕️ Doctor';
+      case 'admin':
+        return '👑 Administrador';
+      default:
+        return '';
+    }
+  }
+
+  /**
    * Alternar menú de usuario
    */
   toggleMenuUsuario() {
@@ -104,24 +118,6 @@ export class NavbarComponent implements OnInit {
     const resultado = await this.autenticacionService.cerrarSesion();
     if (resultado.exito) {
       this.router.navigate(['/autenticacion/inicio-sesion']);
-    }
-  }
-
-  /**
-   * Obtener badge del rol
-   */
-  get rolBadge(): string {
-    if (!this.usuario) return '';
-    
-    switch (this.usuario.rol) {
-      case 'paciente':
-        return '👤 Paciente';
-      case 'doctor':
-        return '👨‍⚕️ Doctor';
-      case 'admin':
-        return '👑 Administrador';
-      default:
-        return '';
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { InicioPacienteComponent} from './inicio-paciente/inicio-paciente.component';
-import { ListaDoctores } from './lista-doctores/lista-doctores';
+import { ListaDoctoresComponent } from './lista-doctores/lista-doctores.component';
 import { AgendarCita } from './agendar-cita/agendar-cita';
 import { MisCitas} from './mis-citas/mis-citas';
 import { DetalleDoctor} from './detalle-doctor/detalle-doctor';
@@ -22,7 +22,7 @@ export const PACIENTE_ROUTES: Routes = [
   },
   {
     path: 'doctores',
-    component: ListaDoctores,
+    component: ListaDoctoresComponent,
     title: 'Buscar Doctores'
   },
   {
