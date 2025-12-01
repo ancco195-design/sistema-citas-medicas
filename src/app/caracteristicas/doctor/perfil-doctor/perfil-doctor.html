@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+
+<div class="container fade-in">
+  <h1>Mi Perfil Profesional</h1>
+  
+  <div class="perfil-card">
+    <div class="header-perfil">
+      <div class="avatar-grande">👨‍⚕️</div>
+      <div class="datos-principales">
+        <h2>Dr. {{ nombreMostrar }}</h2>
+        <span class="badge">{{ especialidadMostrar }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="formPerfil" (ngSubmit)="guardar()" class="form-grid">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input formControlName="nombre" type="text" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label>Apellido</label>
+        <input formControlName="apellido" type="text" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Especialidad</label>
+        <select formControlName="especialidad" class="form-control">
+          <option value="Cardiología">Cardiología</option>
+          <option value="Pediatría">Pediatría</option>
+          <option value="Medicina General">Medicina General</option>
+          <option value="Dermatología">Dermatología</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input formControlName="telefono" type="tel" class="form-control">
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-guardar" [disabled]="procesando || formPerfil.invalid">
+          {{ procesando ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

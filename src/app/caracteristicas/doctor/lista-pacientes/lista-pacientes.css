@@ -1,0 +1,202 @@
+/* Contenedor principal */
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Cabecera */
+.header {
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.header p {
+  margin: 0.5rem 0 0 0;
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+/* --- Estados (Carga / Vacío) --- */
+.loading, .empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty h3 {
+  margin: 0.5rem 0;
+  color: #334155;
+}
+
+/* Spinner de carga */
+.spinner {
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #0f766e; /* Color teal oscuro */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Grid de Pacientes --- */
+.grid-pacientes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Tarjeta individual */
+.card-paciente {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-paciente:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: #e2e8f0;
+}
+
+/* Avatar circular */
+.avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+  color: #0f766e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  flex-shrink: 0; /* Evita que se aplaste */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Información del paciente */
+.info {
+  flex: 1;
+  min-width: 0; /* Para que el texto largo se corte con ellipsis si es necesario */
+}
+
+.info h3 {
+  margin: 0 0 0.4rem 0;
+  color: #1e293b;
+  font-size: 1.15rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dato-visita {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.6rem;
+}
+
+.icono-visita {
+  font-size: 1rem;
+}
+
+/* Badge de contador */
+.badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  letter-spacing: 0.025em;
+  border: 1px solid #e2e8f0;
+}
+
+/* Botón de Historial */
+.btn-historial {
+  background: transparent;
+  border: 1px solid #0d9488;
+  color: #0d9488;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-historial:hover {
+  background: #0d9488;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
+}
+
+/* Animación de entrada */
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .card-paciente {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .dato-visita {
+    justify-content: center;
+  }
+  
+  .btn-historial {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}

@@ -1,0 +1,153 @@
+<!-- Navbar -->
+<app-navbar></app-navbar>
+
+<!-- Contenedor Principal -->
+<div class="contenedor-principal">
+  <div class="contenido">
+
+    <!-- Cargando -->
+    <div *ngIf="!!cargando" class="cargando">
+      <div class="spinner"></div>
+      <p>Cargando información...</p>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!cargando" class="contenedor-formulario">
+
+      <!-- Encabezado -->
+      <div class="encabezado">
+        <button class="btn-volver" (click)="cancelar()">
+          ← Volver
+        </button>
+        <h1>📅 Agendar Cita Médica</h1>
+        <p>Completa el formulario para agendar tu cita</p>
+      </div>
+
+      <!-- Información del Doctor -->
+      <div class="info-doctor" *ngIf="doctor && doctorUsuario">
+        <div class="doctor-avatar">
+          {{ doctorUsuario.nombre.charAt(0) }}{{ doctorUsuario.apellido.charAt(0) }}
+        </div>
+        <div class="doctor-datos">
+          <h3>{{ nombreDoctor }}</h3>
+          <p class="especialidad">🩺 {{ doctor.especialidad }}</p>
+          <p class="consultorio">🏥 {{ doctor.consultorio }}</p>
+        </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div *ngIf="mensajeExito" class="alerta-exito">
+        <span>✅ {{ mensajeExito }}</span>
+      </div>
+
+      <div *ngIf="mensajeError" class="alerta-error">
+        <span>⚠️ {{ mensajeError }}</span>
+      </div>
+
+      <!-- Formulario -->
+      <form [formGroup]="formularioCita" (ngSubmit)="onSubmit()" class="formulario">
+
+        <!-- Fecha -->
+        <div class="grupo-formulario">
+          <label for="fecha">📆 Fecha de la Cita *</label>
+          <input 
+            type="date"
+            id="fecha"
+            formControlName="fecha"
+            [min]="fechaMinima"
+            [max]="fechaMaxima"
+            [class.error]="formularioCita.get('fecha')?.invalid && formularioCita.get('fecha')?.touched"
+          >
+          <span 
+            class="mensaje-error" 
+            *ngIf="formularioCita.get('fecha')?.invalid && formularioCita.get('fecha')?.touched"
+          >
+            {{ obtenerMensajeError('fecha') }}
+          </span>
+          <small class="ayuda">Selecciona una fecha a partir de mañana</small>
+        </div>
+
+        <!-- Hora -->
+        <div class="grupo-formulario">
+          <label for="hora">🕐 Hora de la Cita *</label>
+          <select 
+            id="hora"
+            formControlName="hora"
+            [class.error]="formularioCita.get('hora')?.invalid && formularioCita.get('hora')?.touched"
+            [disabled]="!formularioCita.get('fecha')?.value"
+          >
+            <option value="">Selecciona una hora</option>
+            <option *ngFor="let hora of horasDisponibles" [value]="hora">
+              {{ hora }}
+            </option>
+          </select>
+          <span 
+            class="mensaje-error" 
+            *ngIf="formularioCita.get('hora')?.invalid && formularioCita.get('hora')?.touched"
+          >
+            {{ obtenerMensajeError('hora') }}
+          </span>
+          <small class="ayuda" *ngIf="!formularioCita.get('fecha')?.value">
+            Primero selecciona una fecha
+          </small>
+        </div>
+
+        <!-- Motivo -->
+        <div class="grupo-formulario">
+          <label for="motivo">📝 Motivo de la Consulta *</label>
+          <textarea 
+            id="motivo"
+            formControlName="motivo"
+            placeholder="Describe el motivo de tu consulta (mínimo 10 caracteres)..."
+            rows="5"
+            [class.error]="formularioCita.get('motivo')?.invalid && formularioCita.get('motivo')?.touched"
+          ></textarea>
+          <span 
+            class="mensaje-error" 
+            *ngIf="formularioCita.get('motivo')?.invalid && formularioCita.get('motivo')?.touched"
+          >
+            {{ obtenerMensajeError('motivo') }}
+          </span>
+          <small class="contador">
+            {{ formularioCita.get('motivo')?.value?.length || 0 }} / 500 caracteres
+          </small>
+        </div>
+
+        <!-- Información Importante -->
+        <div class="info-importante">
+          <h4>ℹ️ Información Importante</h4>
+          <ul>
+            <li>La cita quedará en estado "Pendiente" hasta que el doctor la confirme</li>
+            <li>Recibirás una notificación cuando el doctor confirme tu cita</li>
+            <li>Puedes cancelar la cita hasta 24 horas antes</li>
+            <li>Por favor, llega 10 minutos antes de tu cita</li>
+          </ul>
+        </div>
+
+        <!-- Botones -->
+        <div class="grupo-botones">
+          <button 
+            type="button"
+            class="btn-cancelar"
+            (click)="cancelar()"
+            [disabled]="procesando"
+          >
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit"
+            class="btn-agendar"
+            [disabled]="formularioCita.invalid || procesando"
+          >
+            <span *ngIf="!procesando">📅 Agendar Cita</span>
+            <span *ngIf="procesando">Agendando...</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>

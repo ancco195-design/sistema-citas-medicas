@@ -63,8 +63,8 @@ export class NavbarComponent implements OnInit {
       
       case 'doctor':
         return [
+          { ruta : '/doctor/inicio', texto: 'Inicio', icono: '🏠' },
           { ruta: '/doctor/agenda', texto: 'Mi Agenda', icono: '📅' },
-          { ruta: '/doctor/citas', texto: 'Citas', icono: '🩺' },
           { ruta: '/doctor/perfil', texto: 'Mi Perfil', icono: '👨‍⚕️' }
         ];
       

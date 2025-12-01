@@ -1,0 +1,88 @@
+<!-- dashboard.component.html -->
+<app-navbar></app-navbar>
+
+<div class="container fade-in">
+  <!-- ENCABEZADO -->
+  <header class="dashboard-header">
+    <div>
+      <h1>¡Hola, Doctor! 👋</h1>
+      <p class="subtitle">Aquí está el resumen de tu día - {{ fechaHoy | date:'fullDate' }}</p>
+    </div>
+  </header>
+  
+  <!-- TARJETAS DE RESUMEN -->
+  <section class="dashboard-grid" aria-label="Resumen de actividad">
+    <article class="card hoy">
+      <div class="card-icon">📅</div>
+      <div class="card-content">
+        <h3>Citas Hoy</h3>
+        <div class="numero">{{ citasHoy }}</div>
+        <small>Agendadas para hoy</small>
+      </div>
+    </article>
+    
+    <article class="card pendientes">
+      <div class="card-icon">⏳</div>
+      <div class="card-content">
+        <h3>Pendientes</h3>
+        <div class="numero">{{ pendientes }}</div>
+        <small>Requieren confirmación</small>
+      </div>
+    </article>
+    
+    <article class="card pacientes">
+      <div class="card-icon">👥</div>
+      <div class="card-content">
+        <h3>Total Pacientes</h3>
+        <div class="numero">{{ totalPacientes }}</div>
+        <small>Atendidos históricamente</small>
+      </div>
+    </article>
+  </section>
+
+  <!-- ACCESOS RÁPIDOS -->
+  <section class="acciones-rapidas">
+    <h2>Accesos Rápidos</h2>
+    <nav class="botones-grid" aria-label="Navegación rápida">
+      <a routerLink="/doctor/agenda" class="btn-accion" aria-label="Ver agenda completa">
+        <span class="btn-icon">📅</span>
+        <span class="btn-text">
+          <strong>Ver Agenda</strong>
+          <small>Revisa todas tus citas</small>
+        </span>
+      </a>
+      
+      <a routerLink="/doctor/pacientes" class="btn-accion" aria-label="Ver listado de pacientes">
+        <span class="btn-icon">👥</span>
+        <span class="btn-text">
+          <strong>Pacientes</strong>
+          <small>Gestiona tu lista</small>
+        </span>
+      </a>
+      
+      <a routerLink="/doctor/perfil" class="btn-accion" aria-label="Editar perfil">
+        <span class="btn-icon">⚙️</span>
+        <span class="btn-text">
+          <strong>Mi Perfil</strong>
+          <small>Configura tu cuenta</small>
+        </span>
+      </a>
+
+      <a routerLink="/doctor/nueva-cita" class="btn-accion btn-primario" aria-label="Agendar nueva cita">
+        <span class="btn-icon">➕</span>
+        <span class="btn-text">
+          <strong>Nueva Cita</strong>
+          <small>Agendar paciente</small>
+        </span>
+      </a>
+    </nav>
+  </section>
+
+  <!-- PRÓXIMAS CITAS (opcional) -->
+  <section class="proximas-citas" *ngIf="citasHoy > 0">
+    <h2>Próximas Citas de Hoy</h2>
+    <div class="citas-preview">
+      <p class="info-text">🕐 Consulta tu agenda para ver los detalles</p>
+    </div>
+  </section>
+</div>

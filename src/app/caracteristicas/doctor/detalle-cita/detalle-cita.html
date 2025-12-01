@@ -1,0 +1,63 @@
+<app-navbar></app-navbar>
+
+<div class="container fade-in">
+  
+  <button class="btn-volver" (click)="volver()">← Volver a la Agenda</button>
+
+  <div *ngIf="cargando" class="loading">Cargando detalles...</div>
+
+  <div *ngIf="cita" class="detalle-card">
+    
+    <!-- HEADER CON COLOR DINÁMICO -->
+    <!-- [ngClass] cambia el color de fondo según si es pendiente/confirmada/etc -->
+    <div class="header-cita" [ngClass]="cita.estado">
+      <div>
+        <h1>Consulta Médica</h1>
+        <span class="fecha">{{ formatearFecha(cita.fecha) | date:'fullDate' | titlecase }} - {{ cita.hora }}</span>
+      </div>
+      <span class="badge">{{ cita.estado | uppercase }}</span>
+    </div>
+
+    <div class="body-cita">
+      <!-- DATOS PACIENTE -->
+      <div class="seccion">
+        <h3>👤 Paciente</h3>
+        <p class="dato-grande">{{ cita.pacienteNombre }}</p>
+      </div>
+
+      <!-- MOTIVO -->
+      <div class="seccion">
+        <h3>📋 Motivo de Consulta</h3>
+        <div class="caja-texto">{{ cita.motivo }}</div>
+      </div>
+
+      <!-- NOTAS MÉDICAS -->
+      <div class="seccion">
+        <h3>📝 Notas del Doctor / Diagnóstico</h3>
+        <!-- ngModel conecta con la variable notasMedicas del TS -->
+        <textarea 
+          [(ngModel)]="notasMedicas" 
+          class="form-control area-notas"
+          [disabled]="cita.estado === 'cancelada' || cita.estado === 'completada'"
+          placeholder="Escriba aquí el diagnóstico, receta o indicaciones..."></textarea>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="footer-actions">
+      <!-- Botón para Confirmar si está pendiente -->
+      <button *ngIf="cita.estado === 'pendiente'" (click)="confirmar()" class="btn btn-confirmar">
+        Aceptar Cita
+      </button>
+
+      <!-- Botón para Finalizar si está confirmada -->
+      <button *ngIf="cita.estado === 'confirmada'" (click)="guardarNotas()" class="btn btn-guardar">
+        Guardar Notas / Finalizar
+      </button>
+
+      <!-- Mensaje si ya finalizó -->
+      <span *ngIf="cita.estado === 'completada'" class="texto-finalizado">Consulta Finalizada</span>
+    </div>
+
+  </div>
+</div>

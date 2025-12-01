@@ -1,0 +1,119 @@
+<!-- Navbar -->
+<app-navbar></app-navbar>
+
+<!-- Contenedor Principal -->
+<div class="contenedor-principal">
+  <div class="contenido">
+
+    <!-- Encabezado -->
+    <div class="encabezado">
+      <div class="encabezado-texto">
+        <h1>📋 Mis Citas</h1>
+        <p>Gestiona y revisa todas tus citas médicas</p>
+      </div>
+      <button class="btn-nueva-cita" (click)="agendarNuevaCita()">
+        ➕ Nueva Cita
+      </button>
+    </div>
+
+    <!-- Filtros por Estado -->
+    <div class="filtros-estado">
+      <button
+        *ngFor="let estado of estadosDisponibles"
+        class="btn-filtro"
+        [class.activo]="filtroEstado === estado.valor"
+        (click)="filtrarPorEstado(estado.valor)"
+      >
+        <span class="filtro-icono">{{ estado.icono }}</span>
+        <span class="filtro-texto">{{ estado.texto }}</span>
+        <span class="filtro-contador">({{ contarPorEstado(estado.valor) }})</span>
+      </button>
+    </div>
+
+    <!-- Cargando -->
+    <div *ngIf="cargando" class="cargando">
+      <div class="spinner"></div>
+      <p>Cargando tus citas...</p>
+    </div>
+
+    <!-- Sin Citas -->
+    <div *ngIf="!cargando && citasFiltradas.length === 0" class="sin-citas">
+      <div class="sin-citas-icono">📭</div>
+      <h3>No tienes citas {{ filtroEstado === 'todas' ? '' : filtroEstado + 's' }}</h3>
+      <p>Agenda tu primera cita con uno de nuestros especialistas</p>
+      <button class="btn-agendar" (click)="agendarNuevaCita()">
+        📅 Buscar Doctores
+      </button>
+    </div>
+
+    <!-- Lista de Citas -->
+    <div *ngIf="!cargando && citasFiltradas.length > 0" class="lista-citas">
+      
+      <div *ngFor="let cita of citasFiltradas" class="tarjeta-cita">
+        
+        <!-- Fecha -->
+        <div class="cita-fecha">
+          <div class="fecha-dia">{{ cita.fecha | date:'dd' }}</div>
+          <div class="fecha-mes">{{ cita.fecha | date:'MMM' }}</div>
+          <div class="fecha-año">{{ cita.fecha | date:'yyyy' }}</div>
+        </div>
+
+        <!-- Información -->
+        <div class="cita-info">
+          <div class="cita-encabezado">
+            <h3>{{ cita.doctorNombre }}</h3>
+            <span 
+              class="badge-estado" 
+              [ngClass]="obtenerClaseEstado(cita.estado)"
+            >
+              {{ obtenerBadgeEstado(cita.estado) }}
+            </span>
+          </div>
+
+          <div class="cita-detalles">
+            <div class="detalle-item">
+              <span class="detalle-icono">🩺</span>
+              <span>{{ cita.especialidad }}</span>
+            </div>
+
+            <div class="detalle-item">
+              <span class="detalle-icono">🕐</span>
+              <span>{{ cita.hora }}</span>
+            </div>
+
+            <div class="detalle-item" *ngIf="cita.consultorio">
+              <span class="detalle-icono">🏥</span>
+              <span>{{ cita.consultorio }}</span>
+            </div>
+          </div>
+
+          <div class="cita-motivo">
+            <strong>Motivo:</strong> {{ cita.motivo }}
+          </div>
+
+          <div class="cita-notas" *ngIf="cita.notas">
+            <strong>Notas del doctor:</strong> {{ cita.notas }}
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="cita-acciones">
+          <button 
+            class="btn-cancelar-cita"
+            (click)="cancelarCita(cita)"
+            *ngIf="puedeCancelar(cita)"
+          >
+            ❌ Cancelar
+          </button>
+
+          <div class="info-creacion">
+            <small>Creada: {{ cita.fechaCreacion | date:'short' }}</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

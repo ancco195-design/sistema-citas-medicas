@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { InicioPacienteComponent} from './inicio-paciente/inicio-paciente.component';
 import { ListaDoctoresComponent } from './lista-doctores/lista-doctores.component';
-import { AgendarCita } from './agendar-cita/agendar-cita';
-import { MisCitas} from './mis-citas/mis-citas';
+import { AgendarCitaComponent } from './agendar-cita/agendar-cita.component';
+import { MisCitasComponent} from './mis-citas/mis-citas.component';      
 import { DetalleDoctor} from './detalle-doctor/detalle-doctor';
 
 /**
@@ -32,12 +32,12 @@ export const PACIENTE_ROUTES: Routes = [
   },
   {
     path: 'agendar-cita/:doctorId',
-    component: AgendarCita,
+    component: AgendarCitaComponent,
     title: 'Agendar Cita'
   },
   {
     path: 'mis-citas',
-    component: MisCitas,
+    component: MisCitasComponent,
     title: 'Mis Citas'
   }
 ];

@@ -1,0 +1,70 @@
+<app-navbar></app-navbar>
+
+<div class="container fade-in">
+  <h1>Gestión de Agenda</h1>
+  <p class="subtitle">Administra tus consultas asignadas</p>
+
+  <div *ngIf="cargando" class="loading-spinner">
+    <div class="spinner"></div> Cargando agenda...
+  </div>
+
+  <div *ngIf="!cargando">
+    
+    <div *ngIf="citas.length === 0" class="empty-state">
+      <p>No tienes citas programadas por el momento.</p>
+    </div>
+
+    <div class="lista-agenda">
+      <!-- Fila de Cita -->
+      <!-- Al hacer click en toda la fila, va al detalle -->
+      <div *ngFor="let cita of citas" 
+           class="fila-cita" 
+           [ngClass]="cita.estado"
+           (click)="verDetalle(cita.id!)">
+        
+        <!-- Fecha Grande -->
+        <div class="col-fecha">
+          <span class="dia">{{ formatearFecha(cita.fecha) | date:'dd' }}</span>
+          <span class="mes">{{ formatearFecha(cita.fecha) | date:'MMM' | uppercase }}</span>
+        </div>
+
+        <!-- Info Paciente -->
+        <div class="col-info">
+          <h3>{{ cita.pacienteNombre || 'Paciente sin nombre' }}</h3>
+          <p class="hora-badge">🕒 {{ cita.hora }}</p>
+          <p class="motivo">"{{ cita.motivo }}"</p>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-estado">
+          <span class="badge" [ngClass]="cita.estado">{{ cita.estado | uppercase }}</span>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="col-acciones">
+          <ng-container *ngIf="procesandoId !== cita.id; else spinnerBtn">
+            
+            <!-- Si está Pendiente -->
+            <div *ngIf="cita.estado === 'pendiente'" class="btn-group">
+              <button (click)="gestionarCita(cita, 'confirmar', $event)" class="btn-icon check" title="Aceptar">✓</button>
+              <button (click)="gestionarCita(cita, 'cancelar', $event)" class="btn-icon cross" title="Rechazar">✕</button>
+            </div>
+
+            <!-- Si está Confirmada -->
+            <div *ngIf="cita.estado === 'confirmada'">
+              <button (click)="gestionarCita(cita, 'completar', $event)" class="btn-completar">
+                Atender
+              </button>
+            </div>
+
+          </ng-container>
+          
+          <ng-template #spinnerBtn>
+            <span class="mini-loader">⌛</span>
+          </ng-template>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

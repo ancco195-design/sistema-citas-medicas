@@ -1,0 +1,51 @@
+<app-navbar></app-navbar>
+
+<div class="container fade-in">
+  <div class="header">
+    <h1>Mis Pacientes</h1>
+    <p>Historial de personas atendidas en tu consulta</p>
+  </div>
+  
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="loading">
+    <div class="spinner"></div> 
+    <p>Cargando historial de pacientes...</p>
+  </div>
+
+  <!-- Estado Vacío -->
+  <div *ngIf="!cargando && pacientes.length === 0" class="empty">
+    <div class="empty-icon">👥</div>
+    <h3>Aún no tienes pacientes registrados</h3>
+    <p>Los pacientes aparecerán aquí automáticamente una vez que tengas tu primera cita con ellos.</p>
+  </div>
+
+  <!-- Grid de Pacientes -->
+  <div *ngIf="!cargando && pacientes.length > 0" class="grid-pacientes">
+    <div *ngFor="let p of pacientes" class="card-paciente">
+      
+      <!-- Avatar con la inicial -->
+      <div class="avatar">
+        {{ p.nombre.charAt(0) | uppercase }}
+      </div>
+      
+      <div class="info">
+        <h3>{{ p.nombre }}</h3>
+        
+        <div class="dato-visita">
+          <span class="icono-visita">📅</span>
+          <span>Última visita: {{ p.ultimaCita | date:'mediumDate' }}</span>
+        </div>
+        
+        <span class="badge">
+          {{ p.totalCitas }} {{ p.totalCitas === 1 ? 'Cita' : 'Citas' }} en total
+        </span>
+      </div>
+      
+      <!-- Botón de Acción (Futura implementación: Ver detalle completo del paciente) -->
+      <button class="btn-historial" title="Ver historial completo">
+        Ver Historial
+      </button>
+
+    </div>
+  </div>
+</div>
