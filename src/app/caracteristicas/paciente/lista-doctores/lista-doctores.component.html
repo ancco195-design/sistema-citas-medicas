@@ -13,149 +13,161 @@
       </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="seccion-filtros">
-      <div class="filtros-contenedor">
-        
-        <!-- Búsqueda por nombre -->
-        <div class="filtro-grupo">
-          <label>🔎 Buscar por nombre</label>
-          <input 
-            type="text"
-            [(ngModel)]="filtroBusqueda"
-            (ngModelChange)="aplicarFiltros()"
-            placeholder="Nombre del doctor..."
-            class="filtro-input"
-          >
+    <!-- Loader mientras carga -->
+    <div *ngIf="cargando" class="sin-resultados">
+      <div class="sin-resultados-icono">⏳</div>
+      <h3>Cargando doctores...</h3>
+      <p>Por favor espera un momento</p>
+    </div>
+
+    <!-- Contenido cuando ya cargó -->
+    <ng-container *ngIf="!cargando">
+
+      <!-- Filtros -->
+      <div class="seccion-filtros">
+        <div class="filtros-contenedor">
+          
+          <!-- Búsqueda por nombre -->
+          <div class="filtro-grupo">
+            <label>🔎 Buscar por nombre</label>
+            <input 
+              type="text"
+              [(ngModel)]="filtroBusqueda"
+              (ngModelChange)="aplicarFiltros()"
+              placeholder="Nombre del doctor..."
+              class="filtro-input"
+            >
+          </div>
+
+          <!-- Filtro por especialidad -->
+          <div class="filtro-grupo">
+            <label>🩺 Especialidad</label>
+            <select 
+              [(ngModel)]="filtroEspecialidad"
+              (ngModelChange)="aplicarFiltros()"
+              class="filtro-select"
+            >
+              <option value="">Todas las especialidades</option>
+              <option *ngFor="let esp of especialidades" [value]="esp.nombre">
+                {{ esp.icono }} {{ esp.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Botón limpiar -->
+          <div class="filtro-grupo">
+            <label>&nbsp;</label>
+            <button 
+              class="btn-limpiar"
+              (click)="limpiarFiltros()"
+              *ngIf="filtroEspecialidad || filtroBusqueda"
+            >
+              🗑️ Limpiar filtros
+            </button>
+          </div>
+
         </div>
 
-        <!-- Filtro por especialidad -->
-        <div class="filtro-grupo">
-          <label>🩺 Especialidad</label>
-          <select 
-            [(ngModel)]="filtroEspecialidad"
-            (ngModelChange)="aplicarFiltros()"
-            class="filtro-select"
-          >
-            <option value="">Todas las especialidades</option>
-            <option *ngFor="let esp of especialidades" [value]="esp.nombre">
-              {{ esp.icono }} {{ esp.nombre }}
-            </option>
-          </select>
+        <!-- Resultados -->
+        <div class="resultados-contador">
+          <p>
+            <strong>{{ doctoresFiltrados.length }}</strong> 
+            {{ doctoresFiltrados.length === 1 ? 'doctor encontrado' : 'doctores encontrados' }}
+          </p>
         </div>
+      </div>
 
-        <!-- Botón limpiar -->
-        <div class="filtro-grupo">
-          <label>&nbsp;</label>
-          <button 
-            class="btn-limpiar"
-            (click)="limpiarFiltros()"
-            *ngIf="filtroEspecialidad || filtroBusqueda"
-          >
-            🗑️ Limpiar filtros
+      <!-- Lista de Doctores -->
+      <div class="lista-doctores">
+
+        <!-- Sin resultados -->
+        <div *ngIf="doctoresFiltrados.length === 0" class="sin-resultados">
+          <div class="sin-resultados-icono">😔</div>
+          <h3>No se encontraron doctores</h3>
+          <p>Intenta cambiar los filtros de búsqueda</p>
+          <button class="btn-secondary" (click)="limpiarFiltros()">
+            Limpiar filtros
           </button>
         </div>
 
-      </div>
-
-      <!-- Resultados -->
-      <div class="resultados-contador">
-        <p>
-          <strong>{{ doctoresFiltrados.length }}</strong> 
-          {{ doctoresFiltrados.length === 1 ? 'doctor encontrado' : 'doctores encontrados' }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Lista de Doctores -->
-    <div class="lista-doctores">
-
-      <!-- Sin resultados -->
-      <div *ngIf="doctoresFiltrados.length === 0" class="sin-resultados">
-        <div class="sin-resultados-icono">😔</div>
-        <h3>No se encontraron doctores</h3>
-        <p>Intenta cambiar los filtros de búsqueda</p>
-        <button class="btn-secondary" (click)="limpiarFiltros()">
-          Limpiar filtros
-        </button>
-      </div>
-
-      <!-- Grid de Doctores -->
-      <div *ngIf="doctoresFiltrados.length > 0" class="grid-doctores">
-        
-        <div 
-          *ngFor="let doctor of doctoresFiltrados"
-          class="tarjeta-doctor"
-        >
+        <!-- Grid de Doctores -->
+        <div *ngIf="doctoresFiltrados.length > 0" class="grid-doctores">
           
-          <!-- Foto del doctor -->
-          <div class="doctor-foto">
-            <div class="foto-placeholder" *ngIf="!obtenerFotoDoctor(doctor.uid)">
-              {{ obtenerIniciales(doctor.uid) }}
-            </div>
-            <img 
-              *ngIf="obtenerFotoDoctor(doctor.uid)"
-              [src]="obtenerFotoDoctor(doctor.uid)" 
-              [alt]="obtenerNombreDoctor(doctor.uid)"
-            >
-          </div>
-
-          <!-- Información del doctor -->
-          <div class="doctor-info">
+          <div 
+            *ngFor="let doctor of doctoresFiltrados"
+            class="tarjeta-doctor"
+          >
             
-            <h3 class="doctor-nombre">{{ obtenerNombreDoctor(doctor.uid) }}</h3>
-            
-            <div class="doctor-especialidad">
-              <span class="especialidad-icono">{{ obtenerIconoEspecialidad(doctor.especialidad) }}</span>
-              <span>{{ doctor.especialidad }}</span>
-            </div>
-
-            <div class="doctor-detalles">
-              <div class="detalle-item">
-                <span class="detalle-icono">💼</span>
-                <span>{{ doctor['añosExperiencia'] }} años de experiencia</span>
+            <!-- Foto del doctor -->
+            <div class="doctor-foto">
+              <div class="foto-placeholder" *ngIf="!obtenerFotoDoctor(doctor.uid)">
+                {{ obtenerIniciales(doctor.uid) }}
               </div>
+              <img 
+                *ngIf="obtenerFotoDoctor(doctor.uid)"
+                [src]="obtenerFotoDoctor(doctor.uid)" 
+                [alt]="obtenerNombreDoctor(doctor.uid)"
+              >
+            </div>
+
+            <!-- Información del doctor -->
+            <div class="doctor-info">
               
-              <div class="detalle-item">
-                <span class="detalle-icono">🏥</span>
-                <span>{{ doctor.consultorio }}</span>
+              <h3 class="doctor-nombre">{{ obtenerNombreDoctor(doctor.uid) }}</h3>
+              
+              <div class="doctor-especialidad">
+                <span class="especialidad-icono">{{ obtenerIconoEspecialidad(doctor.especialidad) }}</span>
+                <span>{{ doctor.especialidad }}</span>
               </div>
 
-              <div class="detalle-item" *ngIf="doctor.calificacion">
-                <span class="detalle-icono">{{ obtenerEstrellas(doctor.calificacion) }}</span>
-                <span>({{ doctor.calificacion }}/5)</span>
+              <div class="doctor-detalles">
+                <div class="detalle-item">
+                  <span class="detalle-icono">💼</span>
+                  <span>{{ doctor['añosExperiencia'] }} años de experiencia</span>
+                </div>
+                
+                <div class="detalle-item">
+                  <span class="detalle-icono">🏥</span>
+                  <span>{{ doctor.consultorio }}</span>
+                </div>
+
+                <div class="detalle-item" *ngIf="doctor.calificacion">
+                  <span class="detalle-icono">{{ obtenerEstrellas(doctor.calificacion) }}</span>
+                  <span>({{ doctor.calificacion }}/5)</span>
+                </div>
               </div>
+
+              <!-- Biografía (truncada) -->
+              <p class="doctor-bio">
+                {{ doctor.biografia.length > 100 ? (doctor.biografia.substring(0, 100) + '...') : doctor.biografia }}
+              </p>
+
             </div>
 
-            <!-- Biografía (truncada) -->
-            <p class="doctor-bio">
-              {{ doctor.biografia.length > 100 ? (doctor.biografia.substring(0, 100) + '...') : doctor.biografia }}
-            </p>
+            <!-- Acciones -->
+            <div class="doctor-acciones">
+              <button 
+                class="btn-detalle"
+                (click)="verDetalle(doctor)"
+              >
+                👁️ Ver Perfil
+              </button>
+              
+              <button 
+                class="btn-agendar"
+                (click)="agendarCita(doctor)"
+              >
+                📅 Agendar Cita
+              </button>
+            </div>
 
-          </div>
-
-          <!-- Acciones -->
-          <div class="doctor-acciones">
-            <button 
-              class="btn-detalle"
-              (click)="verDetalle(doctor)"
-            >
-              👁️ Ver Perfil
-            </button>
-            
-            <button 
-              class="btn-agendar"
-              (click)="agendarCita(doctor)"
-            >
-              📅 Agendar Cita
-            </button>
           </div>
 
         </div>
 
       </div>
 
-    </div>
+    </ng-container>
 
   </div>
 </div>

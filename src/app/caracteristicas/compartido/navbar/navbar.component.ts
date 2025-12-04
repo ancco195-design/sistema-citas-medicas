@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
+import { Subject, takeUntil, filter } from 'rxjs';
 
 /**
  * Componente Navbar
@@ -16,10 +17,15 @@ import { Usuario } from '../../../nucleo/modelos/usuario.model';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);
   private usuariosService = inject(UsuariosService);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
+
+  // Cache estático para evitar recargas
+  private static usuarioCache: Usuario | null = null;
+  private static cacheIniciado = false;
 
   usuario: Usuario | null = null;
   mostrarMenuUsuario = false;
@@ -29,24 +35,54 @@ export class NavbarComponent implements OnInit {
   rolBadge = '';
 
   ngOnInit() {
-    this.cargarUsuario();
+    // Si ya hay datos en cache, usarlos inmediatamente
+    if (NavbarComponent.usuarioCache) {
+      this.aplicarDatosUsuario(NavbarComponent.usuarioCache);
+    } else if (!NavbarComponent.cacheIniciado) {
+      // Solo cargar si no se ha iniciado el cache
+      this.cargarUsuario();
+    }
+
+    // Cerrar menús al navegar
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.mostrarMenuUsuario = false;
+      this.mostrarMenuMovil = false;
+    });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Cargar datos del usuario actual
+   * Cargar datos del usuario actual (solo una vez)
    */
   cargarUsuario() {
+    NavbarComponent.cacheIniciado = true;
+    
     const uid = this.autenticacionService.obtenerUid();
     if (uid) {
       this.usuariosService.obtenerUsuario(uid).then(usuario => {
-        this.usuario = usuario;
         if (usuario) {
-          this.nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
-          this.rolBadge = this.obtenerRolBadge(usuario.rol);
-          this.enlacesMenu = this.obtenerEnlacesMenu(usuario.rol);
+          NavbarComponent.usuarioCache = usuario;
+          this.aplicarDatosUsuario(usuario);
         }
       });
     }
+  }
+
+  /**
+   * Aplicar datos del usuario al componente
+   */
+  private aplicarDatosUsuario(usuario: Usuario) {
+    this.usuario = usuario;
+    this.nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
+    this.rolBadge = this.obtenerRolBadge(usuario.rol);
+    this.enlacesMenu = this.obtenerEnlacesMenu(usuario.rol);
   }
 
   /**
@@ -115,6 +151,10 @@ export class NavbarComponent implements OnInit {
    * Cerrar sesión
    */
   async cerrarSesion() {
+    // Limpiar cache al cerrar sesión
+    NavbarComponent.usuarioCache = null;
+    NavbarComponent.cacheIniciado = false;
+    
     const resultado = await this.autenticacionService.cerrarSesion();
     if (resultado.exito) {
       this.router.navigate(['/autenticacion/inicio-sesion']);

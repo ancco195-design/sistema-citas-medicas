@@ -34,32 +34,39 @@ export class ListaDoctoresComponent implements OnInit {
   filtroEspecialidad = '';
   filtroBusqueda = '';
   
-  cargando = false;
+  cargando = true; // ✅ CAMBIADO A TRUE
 
   ngOnInit() {
     this.cargarDoctores();
   }
 
   /**
-   * Cargar todos los doctores - VERSIÓN OPTIMIZADA
+   * Cargar todos los doctores
    */
-  cargarDoctores() {
-    // Cargar doctores desde Firestore
-    this.doctoresService.obtenerTodosDoctores().then(doctores => {
-      this.doctores = doctores;
-      this.doctoresFiltrados = [...doctores];
+  async cargarDoctores() {
+    this.cargando = true;
 
-      // Cargar información de usuarios en paralelo (no bloquea)
-      doctores.forEach(doctor => {
+    try {
+      // Cargar doctores desde Firestore
+      this.doctores = await this.doctoresService.obtenerTodosDoctores();
+      this.doctoresFiltrados = [...this.doctores];
+
+      // Cargar información de usuarios en paralelo
+      const promesasUsuarios = this.doctores.map(doctor =>
         this.usuariosService.obtenerUsuario(doctor.uid).then(usuario => {
           if (usuario) {
             this.usuariosDoctores.set(doctor.uid, usuario);
           }
-        });
-      });
-    }).catch(error => {
+        })
+      );
+
+      await Promise.all(promesasUsuarios);
+
+    } catch (error) {
       console.error('Error al cargar doctores:', error);
-    });
+    } finally {
+      this.cargando = false; // ✅ Ocultar loader cuando termine
+    }
   }
 
   /**
