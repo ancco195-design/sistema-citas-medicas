@@ -1,9 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './nucleo/guardias/auth-guard';
 import { rolGuard } from './nucleo/guardias/rol-guard';
-import { DetalleCita } from './caracteristicas/doctor/detalle-cita/detalle-cita';
-import { PACIENTE_ROUTES } from './caracteristicas/paciente/paciente.routes';
-import { InicioDoctor } from './caracteristicas/doctor/inicio-doctor/inicio-doctor';
 
 /**
  * Rutas principales de la aplicación

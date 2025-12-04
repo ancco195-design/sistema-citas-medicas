@@ -3,6 +3,7 @@ import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AutenticacionService } from '../servicios/autenticacion.service';
 import { UsuariosService } from '../servicios/usuarios.service';
 import { TipoRol } from '../modelos/usuario.model';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * Guard de Roles
@@ -14,10 +15,10 @@ export const rolGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, sta
   const usuariosService = inject(UsuariosService);
   const router = inject(Router);
 
-  // Obtener el UID del usuario actual
-  const uid = autenticacionService.obtenerUid();
+  // IMPORTANTE: Esperar a que Firebase cargue el estado de autenticación
+  const usuario = await firstValueFrom(autenticacionService.usuarioActual$);
 
-  if (!uid) {
+  if (!usuario) {
     // No hay usuario autenticado
     console.log('No hay usuario autenticado. Redirigiendo al login...');
     router.navigate(['/autenticacion/inicio-sesion']);
@@ -34,22 +35,22 @@ export const rolGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, sta
 
   try {
     // Obtener el rol del usuario desde Firestore
-    const usuario = await usuariosService.obtenerUsuario(uid);
+    const datosUsuario = await usuariosService.obtenerUsuario(usuario.uid);
 
-    if (!usuario) {
+    if (!datosUsuario) {
       console.log('Usuario no encontrado en la base de datos');
       router.navigate(['/autenticacion/inicio-sesion']);
       return false;
     }
 
     // Verificar si el rol del usuario está en los roles permitidos
-    if (rolesPermitidos.includes(usuario.rol)) {
+    if (rolesPermitidos.includes(datosUsuario.rol)) {
       return true;
     } else {
-      console.log(`Acceso denegado. Rol requerido: ${rolesPermitidos.join(', ')}. Rol del usuario: ${usuario.rol}`);
+      console.log(`Acceso denegado. Rol requerido: ${rolesPermitidos.join(', ')}. Rol del usuario: ${datosUsuario.rol}`);
       
       // Redirigir según el rol del usuario
-      switch (usuario.rol) {
+      switch (datosUsuario.rol) {
         case 'paciente':
           router.navigate(['/paciente/inicio']);
           break;

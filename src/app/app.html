@@ -1,1 +1,12 @@
-<router-outlet></router-outlet>
+<!-- Loader de carga inicial -->
+<div class="loader-container" *ngIf="cargando()">
+  <div class="loader">
+    <div class="spinner"></div>
+    <p class="loader-text">Cargando...</p>
+  </div>
+</div>
+
+<!-- Contenido de la aplicación -->
+<div [class.hidden]="cargando()">
+  <router-outlet></router-outlet>
+</div>
