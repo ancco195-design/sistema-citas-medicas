@@ -1,0 +1,102 @@
+<app-navbar></app-navbar>
+
+<div class="contenedor-panel">
+  <div class="contenido">
+    
+    <!-- Encabezado -->
+    <div class="encabezado">
+      <h1>📊 Panel de Estadísticas</h1>
+      <p>Análisis general del sistema de citas médicas</p>
+    </div>
+
+    <!-- Cargando -->
+    <div *ngIf="cargando" class="cargando">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+
+    <!-- Contenido -->
+    <div *ngIf="!cargando">
+
+      <!-- Tarjetas Resumen -->
+      <div class="tarjetas-resumen">
+        <div class="tarjeta-resumen">
+          <div class="tarjeta-icono">📅</div>
+          <div class="tarjeta-info">
+            <h3>Total Citas</h3>
+            <p class="numero">{{ totalCitas }}</p>
+          </div>
+        </div>
+
+        <div class="tarjeta-resumen">
+          <div class="tarjeta-icono">👨‍⚕️</div>
+          <div class="tarjeta-info">
+            <h3>Total Doctores</h3>
+            <p class="numero">{{ totalDoctores }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas por Estado -->
+      <div class="seccion-estadisticas">
+        <h2>📈 Citas por Estado</h2>
+        <div class="lista-estadisticas">
+          <div *ngFor="let stat of estadisticasPorEstado" class="item-estadistica">
+            <div class="estadistica-header">
+              <span class="estadistica-label">{{ obtenerNombreEstado(stat.estado) }}</span>
+              <span class="estadistica-numero">{{ stat.cantidad }}</span>
+            </div>
+            <div class="barra-progreso">
+              <div 
+                class="barra-relleno" 
+                [style.width.%]="stat.porcentaje"
+                [style.background-color]="stat.color"
+              ></div>
+            </div>
+            <span class="estadistica-porcentaje">{{ stat.porcentaje }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas por Especialidad -->
+      <div class="seccion-estadisticas">
+        <h2>🩺 Top 5 Especialidades</h2>
+        <div *ngIf="estadisticasPorEspecialidad.length === 0" class="sin-datos">
+          <p>No hay datos de especialidades disponibles</p>
+        </div>
+        <div *ngIf="estadisticasPorEspecialidad.length > 0" class="tabla-estadisticas">
+          <div class="tabla-fila tabla-header">
+            <span>Especialidad</span>
+            <span>Cantidad de Citas</span>
+          </div>
+          <div *ngFor="let stat of estadisticasPorEspecialidad; let i = index" class="tabla-fila">
+            <span class="tabla-ranking">{{ i + 1 }}. {{ stat.especialidad }}</span>
+            <span class="tabla-cantidad">{{ stat.cantidad }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estadísticas por Doctor -->
+      <div class="seccion-estadisticas">
+        <h2>⭐ Top 5 Doctores con Más Citas</h2>
+        <div *ngIf="estadisticasPorDoctor.length === 0" class="sin-datos">
+          <p>No hay datos de doctores disponibles</p>
+        </div>
+        <div *ngIf="estadisticasPorDoctor.length > 0" class="tabla-estadisticas">
+          <div class="tabla-fila tabla-header">
+            <span>Doctor</span>
+            <span>Especialidad</span>
+            <span>Citas</span>
+          </div>
+          <div *ngFor="let stat of estadisticasPorDoctor; let i = index" class="tabla-fila">
+            <span class="tabla-ranking">{{ i + 1 }}. {{ stat.nombre }}</span>
+            <span class="tabla-especialidad">{{ stat.especialidad }}</span>
+            <span class="tabla-cantidad">{{ stat.cantidad }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

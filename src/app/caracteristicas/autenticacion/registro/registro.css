@@ -78,8 +78,8 @@
 
 .selector-rol {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   margin-top: 8px;
 }
 
@@ -87,12 +87,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 15px;
+  padding: 12px 8px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .opcion-rol input[type="radio"] {
@@ -267,5 +268,10 @@
   
   .encabezado-registro h1 {
     font-size: 24px;
+  }
+  
+  .opcion-rol {
+    font-size: 0.85rem;
+    padding: 10px 6px;
   }
 }

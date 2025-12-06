@@ -1,0 +1,275 @@
+.contenedor-panel {
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+}
+
+.contenido {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Encabezado */
+.encabezado {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.encabezado h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.encabezado p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Cargando */
+.cargando {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.cargando p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Tarjetas Resumen */
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tarjeta-resumen {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.tarjeta-resumen:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.tarjeta-icono {
+  font-size: 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tarjeta-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.numero {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Secciones de Estadísticas */
+.seccion-estadisticas {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.seccion-estadisticas h2 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Lista de Estadísticas (con barras) */
+.lista-estadisticas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.item-estadistica {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.estadistica-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estadistica-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.estadistica-numero {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 1.2rem;
+}
+
+.barra-progreso {
+  width: 100%;
+  height: 12px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.barra-relleno {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.estadistica-porcentaje {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: right;
+}
+
+/* Tabla de Estadísticas */
+.tabla-estadisticas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tabla-fila {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.tabla-fila.tabla-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.tabla-ranking {
+  font-weight: 500;
+  color: #333;
+}
+
+.tabla-especialidad {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.tabla-cantidad {
+  font-weight: 700;
+  color: #667eea;
+  text-align: right;
+}
+
+.tabla-header .tabla-cantidad {
+  color: white;
+}
+
+/* Para la tabla de doctores con 3 columnas */
+.seccion-estadisticas:last-child .tabla-fila {
+  grid-template-columns: 2fr 1.5fr 1fr;
+}
+
+/* Sin datos */
+.sin-datos {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .encabezado h1 {
+    font-size: 2rem;
+  }
+
+  .tarjetas-resumen {
+    grid-template-columns: 1fr;
+  }
+
+  .tabla-fila {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .seccion-estadisticas:last-child .tabla-fila {
+    grid-template-columns: 1fr;
+  }
+
+  .estadistica-header {
+    font-size: 0.9rem;
+  }
+
+  .tabla-cantidad {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .contenedor-panel {
+    padding: 1rem 0.5rem;
+  }
+
+  .seccion-estadisticas {
+    padding: 1.5rem 1rem;
+  }
+
+  .encabezado h1 {
+    font-size: 1.5rem;
+  }
+
+  .tarjeta-resumen {
+    padding: 1.5rem;
+  }
+
+  .numero {
+    font-size: 2rem;
+  }
+}

@@ -32,6 +32,10 @@
             <input type="radio" formControlName="rol" value="doctor">
             <span>👨‍⚕️ Doctor</span>
           </label>
+          <label class="opcion-rol" [class.activa]="formularioRegistro.get('rol')?.value === 'admin'">
+            <input type="radio" formControlName="rol" value="admin">
+            <span>🔧 Administrador</span>
+          </label>
         </div>
       </div>
 

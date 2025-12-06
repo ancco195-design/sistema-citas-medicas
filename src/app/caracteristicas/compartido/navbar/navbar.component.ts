@@ -106,10 +106,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       
       case 'admin':
         return [
-          { ruta: '/admin/panel', texto: 'Panel', icono: '📊' },
-          { ruta: '/admin/doctores', texto: 'Doctores', icono: '👨‍⚕️' },
-          { ruta: '/admin/citas', texto: 'Citas', icono: '📅' },
-          { ruta: '/admin/estadisticas', texto: 'Estadísticas', icono: '📈' }
+          { ruta: '/admin/panel', texto: 'Panel', icono: '📊' }
         ];
       
       default:
