@@ -1,15 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router'; // Importar Router para navegar al detalle
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
-import { Cita } from '../../../nucleo/modelos/cita.model';
+import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
 
 @Component({
   selector: 'app-agenda',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, RouterModule],
+  imports: [CommonModule, NavbarComponent, RouterModule, FormsModule],
   templateUrl: './agenda-doctor.html',
   styleUrls: ['./agenda-doctor.css']
 })
@@ -19,11 +20,19 @@ export class AgendaDoctor implements OnInit {
   private router = inject(Router);
 
   citas: Cita[] = [];
+  citasFiltradas: Cita[] = [];
   cargando = true;
   procesandoId: string | null = null;
 
+  // Filtros
+  filtroFecha: string = '';
+  filtroEspecialidad: string = '';
+  filtroEstado: EstadoCita | 'todas' = 'todas';
+  
+  especialidades: string[] = [];
+
   async ngOnInit() {
-    this.cargarAgenda();
+    await this.cargarAgenda();
   }
 
   async cargarAgenda() {
@@ -32,12 +41,50 @@ export class AgendaDoctor implements OnInit {
     
     if (uid) {
       this.citas = await this.citasService.obtenerCitasPorDoctor(uid);
+      this.citasFiltradas = [...this.citas];
+      this.extraerEspecialidades();
     }
     this.cargando = false;
   }
 
+  extraerEspecialidades() {
+    const especialidadesSet = new Set(this.citas.map(c => c.especialidad).filter(Boolean));
+    this.especialidades = Array.from(especialidadesSet);
+  }
+
+  aplicarFiltros() {
+    this.citasFiltradas = this.citas.filter(cita => {
+      // Filtro por fecha
+      if (this.filtroFecha) {
+        const fechaCita = this.formatearFecha(cita.fecha);
+        const fechaFiltro = new Date(this.filtroFecha);
+        if (fechaCita?.toDateString() !== fechaFiltro.toDateString()) {
+          return false;
+        }
+      }
+
+      // Filtro por especialidad
+      if (this.filtroEspecialidad && cita.especialidad !== this.filtroEspecialidad) {
+        return false;
+      }
+
+      // Filtro por estado
+      if (this.filtroEstado !== 'todas' && cita.estado !== this.filtroEstado) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  limpiarFiltros() {
+    this.filtroFecha = '';
+    this.filtroEspecialidad = '';
+    this.filtroEstado = 'todas';
+    this.citasFiltradas = [...this.citas];
+  }
+
   async gestionarCita(cita: Cita, accion: 'confirmar' | 'cancelar' | 'completar', event: Event) {
-    // Evita que el click se propague y abra el detalle al mismo tiempo
     event.stopPropagation();
     
     if (!cita.id) return;
@@ -52,13 +99,13 @@ export class AgendaDoctor implements OnInit {
         if (!confirm('¿Rechazar esta cita?')) { this.procesandoId = null; return; }
         resultado = await this.citasService.cancelarCita(cita.id);
       } else if (accion === 'completar') {
-        // Redirigir al detalle para llenar notas
         this.router.navigate(['/doctor/cita', cita.id]);
         return; 
       }
 
       if (resultado && resultado.exito) {
-        await this.cargarAgenda(); // Recargar lista
+        await this.cargarAgenda();
+        this.aplicarFiltros();
       }
     } catch (error) {
       console.error(error);

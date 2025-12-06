@@ -4,20 +4,65 @@
   <h1>Gestión de Agenda</h1>
   <p class="subtitle">Administra tus consultas asignadas</p>
 
+  <!-- FILTROS -->
+  <div class="filtros-container">
+    <div class="filtros">
+      <!-- Filtro Fecha -->
+      <div class="filtro-item">
+        <label>📅 Fecha:</label>
+        <input 
+          type="date" 
+          [(ngModel)]="filtroFecha" 
+          (change)="aplicarFiltros()"
+          class="input-filtro">
+      </div>
+
+      <!-- Filtro Especialidad -->
+      <div class="filtro-item">
+        <label>🩺 Especialidad:</label>
+        <select 
+          [(ngModel)]="filtroEspecialidad" 
+          (change)="aplicarFiltros()"
+          class="input-filtro">
+          <option value="">Todas</option>
+          <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
+        </select>
+      </div>
+
+      <!-- Filtro Estado -->
+      <div class="filtro-item">
+        <label>📊 Estado:</label>
+        <select 
+          [(ngModel)]="filtroEstado" 
+          (change)="aplicarFiltros()"
+          class="input-filtro">
+          <option value="todas">Todas</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="completada">Completada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
+
+      <!-- Botón Limpiar -->
+      <button class="btn-limpiar" (click)="limpiarFiltros()">
+        🔄 Limpiar
+      </button>
+    </div>
+  </div>
+
   <div *ngIf="cargando" class="loading-spinner">
     <div class="spinner"></div> Cargando agenda...
   </div>
 
   <div *ngIf="!cargando">
     
-    <div *ngIf="citas.length === 0" class="empty-state">
-      <p>No tienes citas programadas por el momento.</p>
+    <div *ngIf="citasFiltradas.length === 0" class="empty-state">
+      <p>No hay citas que coincidan con los filtros.</p>
     </div>
 
     <div class="lista-agenda">
-      <!-- Fila de Cita -->
-      <!-- Al hacer click en toda la fila, va al detalle -->
-      <div *ngFor="let cita of citas" 
+      <div *ngFor="let cita of citasFiltradas" 
            class="fila-cita" 
            [ngClass]="cita.estado"
            (click)="verDetalle(cita.id!)">
@@ -44,13 +89,11 @@
         <div class="col-acciones">
           <ng-container *ngIf="procesandoId !== cita.id; else spinnerBtn">
             
-            <!-- Si está Pendiente -->
             <div *ngIf="cita.estado === 'pendiente'" class="btn-group">
               <button (click)="gestionarCita(cita, 'confirmar', $event)" class="btn-icon check" title="Aceptar">✓</button>
               <button (click)="gestionarCita(cita, 'cancelar', $event)" class="btn-icon cross" title="Rechazar">✕</button>
             </div>
 
-            <!-- Si está Confirmada -->
             <div *ngIf="cita.estado === 'confirmada'">
               <button (click)="gestionarCita(cita, 'completar', $event)" class="btn-completar">
                 Atender
