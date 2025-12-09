@@ -4,43 +4,33 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
-import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
-import { Doctor } from '../../../nucleo/modelos/doctor.model';
-import { ESPECIALIDADES_COMUNES } from '../../../nucleo/modelos/especialidad.model';
 
 @Component({
-  selector: 'app-perfil-doctor',
+  selector: 'app-perfil-admin',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  templateUrl: './perfil-doctor.html',
-  styleUrl: './perfil-doctor.css'
+  templateUrl: './perfil-admin.html',
+  styleUrl: './perfil-admin.css'
 })
-export class PerfilDoctor implements OnInit {
+export class PerfilAdmin implements OnInit {
   private fb = inject(FormBuilder);
   private autenticacionService = inject(AutenticacionService);
   private usuariosService = inject(UsuariosService);
-  private doctoresService = inject(DoctoresService);
 
   usuario: Usuario | null = null;
-  doctor: Doctor | null = null;
   formularioPerfil: FormGroup;
   cargando = true;
   guardando = false;
   modoEdicion = false;
   mensajeExito = '';
   mensajeError = '';
-  especialidades = ESPECIALIDADES_COMUNES;
 
   constructor() {
     this.formularioPerfil = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellido: ['', [Validators.required, Validators.minLength(2)]],
-      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]],
-      especialidad: ['', [Validators.required]],
-      consultorio: ['', [Validators.required]],
-      biografia: ['', [Validators.required, Validators.minLength(20)]],
-      añosExperiencia: [0, [Validators.required, Validators.min(0)]]
+      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]]
     });
   }
 
@@ -53,21 +43,13 @@ export class PerfilDoctor implements OnInit {
     const uid = this.autenticacionService.obtenerUid();
     
     if (uid) {
-      // Cargar datos del usuario
       this.usuario = await this.usuariosService.obtenerUsuario(uid);
       
-      // Cargar datos del doctor
-      this.doctor = await this.doctoresService.obtenerDoctor(uid);
-      
-      if (this.usuario && this.doctor) {
+      if (this.usuario) {
         this.formularioPerfil.patchValue({
           nombre: this.usuario.nombre,
           apellido: this.usuario.apellido,
-          telefono: this.usuario.telefono,
-          especialidad: this.doctor.especialidad,
-          consultorio: this.doctor.consultorio,
-          biografia: this.doctor.biografia,
-          añosExperiencia: this.doctor.añosExperiencia
+          telefono: this.usuario.telefono
         });
         
         // Deshabilitar el formulario inicialmente
@@ -82,7 +64,7 @@ export class PerfilDoctor implements OnInit {
     this.modoEdicion = true;
     this.mensajeExito = '';
     this.mensajeError = '';
-    this.formularioPerfil.enable(); // Habilitar el formulario
+    this.formularioPerfil.enable();
   }
 
   cancelarEdicion() {
@@ -91,15 +73,11 @@ export class PerfilDoctor implements OnInit {
     this.mensajeError = '';
     
     // Restaurar valores originales
-    if (this.usuario && this.doctor) {
+    if (this.usuario) {
       this.formularioPerfil.patchValue({
         nombre: this.usuario.nombre,
         apellido: this.usuario.apellido,
-        telefono: this.usuario.telefono,
-        especialidad: this.doctor.especialidad,
-        consultorio: this.doctor.consultorio,
-        biografia: this.doctor.biografia,
-        añosExperiencia: this.doctor.añosExperiencia
+        telefono: this.usuario.telefono
       });
     }
     
@@ -123,23 +101,9 @@ export class PerfilDoctor implements OnInit {
       const datos = this.formularioPerfil.value;
       
       try {
-        // Actualizar datos de usuario (nombre, apellido, teléfono)
-        const resultadoUsuario = await this.usuariosService.actualizarUsuario(uid, {
-          nombre: datos.nombre,
-          apellido: datos.apellido,
-          telefono: datos.telefono,
-          especialidad: datos.especialidad
-        });
+        const resultado = await this.usuariosService.actualizarUsuario(uid, datos);
 
-        // Actualizar datos de doctor
-        const resultadoDoctor = await this.doctoresService.actualizarDoctor(uid, {
-          especialidad: datos.especialidad,
-          consultorio: datos.consultorio,
-          biografia: datos.biografia,
-          añosExperiencia: datos.añosExperiencia
-        });
-
-        if (resultadoUsuario.exito && resultadoDoctor.exito) {
+        if (resultado.exito) {
           this.mensajeExito = 'Perfil actualizado exitosamente';
           this.modoEdicion = false;
           await this.cargarDatos();
@@ -199,10 +163,6 @@ export class PerfilDoctor implements OnInit {
     
     if (control?.hasError('pattern')) {
       return 'Ingrese un teléfono válido (9 dígitos)';
-    }
-    
-    if (control?.hasError('min')) {
-      return 'Debe ser mayor o igual a 0';
     }
     
     return '';

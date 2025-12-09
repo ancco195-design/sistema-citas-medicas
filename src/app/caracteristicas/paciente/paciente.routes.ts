@@ -39,5 +39,10 @@ export const PACIENTE_ROUTES: Routes = [
     path: 'mis-citas',
     component: MisCitasComponent,
     title: 'Mis Citas'
+  },
+  {
+    path: 'perfil',
+    loadComponent: () => import('./perfil-paciente/perfil-paciente').then(m => m.PerfilPaciente),
+    title: 'Mi Perfil'
   }
 ];

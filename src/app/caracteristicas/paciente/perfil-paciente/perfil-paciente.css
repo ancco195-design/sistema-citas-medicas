@@ -5,7 +5,7 @@
 }
 
 .contenido {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -113,7 +113,7 @@
   font-size: 1.8rem;
 }
 
-.badge-especialidad {
+.badge-rol {
   display: inline-block;
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -213,9 +213,7 @@
   font-size: 0.95rem;
 }
 
-.grupo-formulario input,
-.grupo-formulario select,
-.grupo-formulario textarea {
+.grupo-formulario input {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #e0e0e0;
@@ -223,33 +221,21 @@
   font-size: 1rem;
   transition: all 0.3s;
   box-sizing: border-box;
-  font-family: inherit;
 }
 
-.grupo-formulario input:disabled,
-.grupo-formulario select:disabled,
-.grupo-formulario textarea:disabled {
+.grupo-formulario input:disabled {
   background: #f8f9fa;
   cursor: not-allowed;
 }
 
-.grupo-formulario input:focus:not(:disabled),
-.grupo-formulario select:focus:not(:disabled),
-.grupo-formulario textarea:focus:not(:disabled) {
+.grupo-formulario input:focus:not(:disabled) {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.grupo-formulario input.error,
-.grupo-formulario select.error,
-.grupo-formulario textarea.error {
+.grupo-formulario input.error {
   border-color: #f44336;
-}
-
-.grupo-formulario textarea {
-  resize: vertical;
-  min-height: 100px;
 }
 
 .mensaje-error {

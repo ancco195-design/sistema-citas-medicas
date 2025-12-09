@@ -56,11 +56,6 @@
           
           <div class="dropdown-divider"></div>
           
-          <a class="dropdown-item" [routerLink]="'/perfil'">
-            <span>👤</span>
-            <span>Mi Perfil</span>
-          </a>
-          
           <a class="dropdown-item" [routerLink]="'/configuracion'">
             <span>⚙️</span>
             <span>Configuración</span>
@@ -90,7 +85,7 @@
 
 <!-- Overlay para cerrar menús -->
 <div 
-  class="navbar-overlay" a
+  class="navbar-overlay"
   *ngIf="mostrarMenuUsuario || mostrarMenuMovil"
   (click)="mostrarMenuUsuario = false; mostrarMenuMovil = false"
 ></div>

@@ -5,8 +5,8 @@
     
     <!-- Encabezado -->
     <div class="encabezado">
-      <h1>👨‍⚕️ Mi Perfil Profesional</h1>
-      <p>Administra tu información médica</p>
+      <h1>👤 Mi Perfil</h1>
+      <p>Administra tu información personal</p>
     </div>
 
     <!-- Cargando -->
@@ -16,7 +16,7 @@
     </div>
 
     <!-- Contenido del Perfil -->
-    <div *ngIf="!cargando && usuario && doctor" class="tarjeta-perfil">
+    <div *ngIf="!cargando && usuario" class="tarjeta-perfil">
       
       <!-- Mensajes -->
       <div *ngIf="mensajeExito" class="alerta alerta-exito">
@@ -33,8 +33,8 @@
           {{ usuario.nombre.charAt(0) }}{{ usuario.apellido.charAt(0) }}
         </div>
         <div class="perfil-info">
-          <h2>Dr(a). {{ usuario.nombre }} {{ usuario.apellido }}</h2>
-          <span class="badge-especialidad">{{ doctor.especialidad }}</span>
+          <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+          <span class="badge-rol">👤 Paciente</span>
         </div>
       </div>
 
@@ -49,22 +49,12 @@
 
         <div class="dato-fila">
           <span class="dato-label">Rol:</span>
-          <span class="dato-valor">👨‍⚕️ Doctor</span>
+          <span class="dato-valor">👤 Paciente</span>
         </div>
 
         <div class="dato-fila">
           <span class="dato-label">Fecha de Registro:</span>
           <span class="dato-valor">{{ formatearFecha(usuario.fechaRegistro) }}</span>
-        </div>
-
-        <div class="dato-fila">
-          <span class="dato-label">Número de Citas:</span>
-          <span class="dato-valor">{{ doctor.numeroCitas || 0 }}</span>
-        </div>
-
-        <div class="dato-fila" *ngIf="doctor.calificacion">
-          <span class="dato-label">Calificación:</span>
-          <span class="dato-valor">⭐ {{ doctor.calificacion.toFixed(1) }}</span>
         </div>
 
         <div class="dato-fila">
@@ -78,7 +68,7 @@
       <!-- Formulario Editable -->
       <div class="seccion-datos">
         <div class="seccion-header">
-          <h3>✏️ Información Personal y Profesional</h3>
+          <h3>✏️ Información Personal</h3>
           <button 
             *ngIf="!modoEdicion" 
             class="btn-editar"
@@ -90,7 +80,6 @@
 
         <form [formGroup]="formularioPerfil" (ngSubmit)="guardarCambios()">
           
-          <!-- Datos Personales -->
           <div class="formulario-fila">
             <div class="grupo-formulario">
               <label for="nombre">Nombre *</label>
@@ -98,7 +87,6 @@
                 type="text" 
                 id="nombre"
                 formControlName="nombre"
-                [disabled]="!modoEdicion"
                 [class.error]="formularioPerfil.get('nombre')?.invalid && formularioPerfil.get('nombre')?.touched"
               >
               <span class="mensaje-error" *ngIf="formularioPerfil.get('nombre')?.invalid && formularioPerfil.get('nombre')?.touched">
@@ -112,7 +100,6 @@
                 type="text" 
                 id="apellido"
                 formControlName="apellido"
-                [disabled]="!modoEdicion"
                 [class.error]="formularioPerfil.get('apellido')?.invalid && formularioPerfil.get('apellido')?.touched"
               >
               <span class="mensaje-error" *ngIf="formularioPerfil.get('apellido')?.invalid && formularioPerfil.get('apellido')?.touched">
@@ -128,75 +115,10 @@
               id="telefono"
               formControlName="telefono"
               maxlength="9"
-              [disabled]="!modoEdicion"
               [class.error]="formularioPerfil.get('telefono')?.invalid && formularioPerfil.get('telefono')?.touched"
             >
             <span class="mensaje-error" *ngIf="formularioPerfil.get('telefono')?.invalid && formularioPerfil.get('telefono')?.touched">
               {{ obtenerMensajeError('telefono') }}
-            </span>
-          </div>
-
-          <!-- Datos Profesionales -->
-          <div class="formulario-fila">
-            <div class="grupo-formulario">
-              <label for="especialidad">Especialidad *</label>
-              <select 
-                id="especialidad"
-                formControlName="especialidad"
-                [disabled]="!modoEdicion"
-                [class.error]="formularioPerfil.get('especialidad')?.invalid && formularioPerfil.get('especialidad')?.touched"
-              >
-                <option value="">Seleccione especialidad</option>
-                <option *ngFor="let esp of especialidades" [value]="esp.nombre">
-                  {{ esp.icono }} {{ esp.nombre }}
-                </option>
-              </select>
-              <span class="mensaje-error" *ngIf="formularioPerfil.get('especialidad')?.invalid && formularioPerfil.get('especialidad')?.touched">
-                {{ obtenerMensajeError('especialidad') }}
-              </span>
-            </div>
-
-            <div class="grupo-formulario">
-              <label for="consultorio">Consultorio *</label>
-              <input 
-                type="text" 
-                id="consultorio"
-                formControlName="consultorio"
-                [disabled]="!modoEdicion"
-                [class.error]="formularioPerfil.get('consultorio')?.invalid && formularioPerfil.get('consultorio')?.touched"
-              >
-              <span class="mensaje-error" *ngIf="formularioPerfil.get('consultorio')?.invalid && formularioPerfil.get('consultorio')?.touched">
-                {{ obtenerMensajeError('consultorio') }}
-              </span>
-            </div>
-          </div>
-
-          <div class="grupo-formulario">
-            <label for="añosExperiencia">Años de Experiencia *</label>
-            <input 
-              type="number" 
-              id="añosExperiencia"
-              formControlName="añosExperiencia"
-              min="0"
-              [disabled]="!modoEdicion"
-              [class.error]="formularioPerfil.get('añosExperiencia')?.invalid && formularioPerfil.get('añosExperiencia')?.touched"
-            >
-            <span class="mensaje-error" *ngIf="formularioPerfil.get('añosExperiencia')?.invalid && formularioPerfil.get('añosExperiencia')?.touched">
-              {{ obtenerMensajeError('añosExperiencia') }}
-            </span>
-          </div>
-
-          <div class="grupo-formulario">
-            <label for="biografia">Biografía Profesional *</label>
-            <textarea 
-              id="biografia"
-              formControlName="biografia"
-              rows="4"
-              [disabled]="!modoEdicion"
-              [class.error]="formularioPerfil.get('biografia')?.invalid && formularioPerfil.get('biografia')?.touched"
-            ></textarea>
-            <span class="mensaje-error" *ngIf="formularioPerfil.get('biografia')?.invalid && formularioPerfil.get('biografia')?.touched">
-              {{ obtenerMensajeError('biografia') }}
             </span>
           </div>
 

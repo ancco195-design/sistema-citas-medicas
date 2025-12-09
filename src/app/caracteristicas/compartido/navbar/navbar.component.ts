@@ -94,7 +94,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
         return [
           { ruta: '/paciente/inicio', texto: 'Inicio', icono: '🏠' },
           { ruta: '/paciente/doctores', texto: 'Buscar Doctores', icono: '🔍' },
-          { ruta: '/paciente/mis-citas', texto: 'Mis Citas', icono: '📅' }
+          { ruta: '/paciente/mis-citas', texto: 'Mis Citas', icono: '📅' },
+          { ruta: '/paciente/perfil', texto: 'Mi Perfil', icono: '👤' }
         ];
       
       case 'doctor':
@@ -106,7 +107,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       
       case 'admin':
         return [
-          { ruta: '/admin/panel', texto: 'Panel', icono: '📊' }
+          { ruta: '/admin/panel', texto: 'Panel', icono: '📊' },
+          { ruta: '/admin/perfil', texto: 'Mi Perfil', icono: '👤' }
         ];
       
       default:
