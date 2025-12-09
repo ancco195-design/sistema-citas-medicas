@@ -9,10 +9,6 @@ import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
 import { Cita } from '../../../nucleo/modelos/cita.model';
 
-/**
- * Componente de Inicio del Paciente
- * Dashboard principal con resumen de información
- */
 @Component({
   selector: 'app-inicio-paciente',
   standalone: true,
@@ -28,19 +24,17 @@ export class InicioPacienteComponent implements OnInit {
   private router = inject(Router);
 
   usuario: Usuario | null = null;
-  citasPendientes: Cita[] = [];
+  citasActivas: Cita[] = [];
   proximasCitas: Cita[] = [];
   totalDoctores = 0;
-  cargando = false; // CAMBIADO A FALSE PARA QUE CARGUE INMEDIATAMENTE
+  cargando = true;
 
   ngOnInit() {
     this.cargarDatos();
   }
 
-  /**
-   * Cargar todos los datos del dashboard
-   */
-  cargarDatos() {
+  async cargarDatos() {
+    this.cargando = true;
     const uid = this.autenticacionService.obtenerUid();
 
     if (!uid) {
@@ -48,37 +42,58 @@ export class InicioPacienteComponent implements OnInit {
       return;
     }
 
-    // Cargar usuario
-    this.usuariosService.obtenerUsuario(uid).then(usuario => {
-      this.usuario = usuario;
-    }).catch(error => {
-      console.error('Error al cargar usuario:', error);
-    });
+    try {
+      this.usuario = await this.usuariosService.obtenerUsuario(uid);
 
-    // Cargar citas
-    this.citasService.obtenerCitasPorPaciente(uid).then(todasCitas => {
-      this.citasPendientes = todasCitas.filter(
-        cita => cita.estado === 'pendiente' || cita.estado === 'confirmada'
-      );
+      const todasCitas = await this.citasService.obtenerCitasPorPaciente(uid);
+      
+      const ahora = new Date();
+      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
 
-      this.proximasCitas = this.citasPendientes
-        .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+      this.citasActivas = todasCitas.filter(cita => {
+        const fechaCita = this.convertirFecha(cita.fecha);
+        const fechaSoloCita = new Date(fechaCita.getFullYear(), fechaCita.getMonth(), fechaCita.getDate());
+        
+        const esEstadoActivo = cita.estado === 'pendiente' || cita.estado === 'confirmada';
+        const esFechaFutura = fechaSoloCita.getTime() >= hoy.getTime();
+        
+        return esEstadoActivo && esFechaFutura;
+      });
+
+      this.proximasCitas = [...this.citasActivas]
+        .sort((a, b) => {
+          const fechaA = this.convertirFecha(a.fecha);
+          const fechaB = this.convertirFecha(b.fecha);
+          return fechaA.getTime() - fechaB.getTime();
+        })
         .slice(0, 3);
-    }).catch(error => {
-      console.warn('No se pudieron cargar las citas:', error);
-    });
 
-    // Cargar doctores
-    this.doctoresService.obtenerTodosDoctores().then(doctores => {
+      const doctores = await this.doctoresService.obtenerTodosDoctores();
       this.totalDoctores = doctores.length;
-    }).catch(error => {
-      console.warn('No se pudieron cargar los doctores:', error);
-    });
+
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    } finally {
+      this.cargando = false;
+    }
   }
 
-  /**
-   * Obtener saludo según la hora
-   */
+  private convertirFecha(fecha: any): Date {
+    if (fecha instanceof Date) {
+      return fecha;
+    }
+    
+    if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
+      return new Date(fecha.seconds * 1000);
+    }
+    
+    if (fecha && typeof fecha.toDate === 'function') {
+      return fecha.toDate();
+    }
+    
+    return new Date(fecha);
+  }
+
   get saludo(): string {
     const hora = new Date().getHours();
     if (hora < 12) return '¡Buenos días';
@@ -86,12 +101,9 @@ export class InicioPacienteComponent implements OnInit {
     return '¡Buenas noches';
   }
 
-  /**
-   * Formatear fecha
-   */
   formatearFecha(fecha: Date): string {
     try {
-      const fechaObj = new Date(fecha);
+      const fechaObj = this.convertirFecha(fecha);
       return fechaObj.toLocaleDateString('es-PE', {
         weekday: 'long',
         year: 'numeric',
@@ -103,12 +115,9 @@ export class InicioPacienteComponent implements OnInit {
     }
   }
 
-  /**
-   * Obtener badge de estado de cita
-   */
   obtenerBadgeEstado(estado: string): string {
     const badges: { [key: string]: string } = {
-      'pendiente': '🕐 Pendiente',
+      'pendiente': '🕒 Pendiente',
       'confirmada': '✅ Confirmada',
       'cancelada': '❌ Cancelada',
       'completada': '✔️ Completada',
@@ -117,30 +126,18 @@ export class InicioPacienteComponent implements OnInit {
     return badges[estado] || estado;
   }
 
-  /**
-   * Obtener clase CSS según estado
-   */
   obtenerClaseEstado(estado: string): string {
     return `estado-${estado}`;
   }
 
-  /**
-   * Navegar a agendar cita
-   */
   navegarAgendarCita() {
     this.router.navigate(['/paciente/doctores']);
   }
 
-  /**
-   * Navegar a ver todas las citas
-   */
   navegarMisCitas() {
     this.router.navigate(['/paciente/mis-citas']);
   }
 
-  /**
-   * Navegar a buscar doctores
-   */
   navegarDoctores() {
     this.router.navigate(['/paciente/doctores']);
   }

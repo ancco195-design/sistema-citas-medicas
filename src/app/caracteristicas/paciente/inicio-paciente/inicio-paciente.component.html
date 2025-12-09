@@ -31,8 +31,8 @@
         <article class="tarjeta-resumen tarjeta-pendientes">
           <div class="tarjeta-icono">📋</div>
           <div class="tarjeta-info">
-            <h3>{{ citasPendientes.length }}</h3>
-            <p>Citas Pendientes</p>
+            <h3>{{ citasActivas.length }}</h3>
+            <p>Citas Activas</p>
           </div>
         </article>
 
@@ -64,7 +64,7 @@
 
         <!-- Sin Citas -->
         <div *ngIf="proximasCitas.length === 0" class="sin-citas">
-          <div class="sin-citas-icono">📭</div>
+          <div class="sin-citas-icono">🔭</div>
           <h3>No tienes citas programadas</h3>
           <p>Agenda tu primera cita con un especialista</p>
           <button class="btn-secondary" (click)="navegarAgendarCita()">Buscar Doctores</button>
@@ -85,7 +85,7 @@
             <div class="cita-info">
               <h3>Dr. {{ cita.doctorNombre }}</h3>
               <p class="cita-especialidad">{{ cita.especialidad }}</p>
-              <p class="cita-hora">🕐 {{ cita.hora }}</p>
+              <p class="cita-hora">🕒 {{ cita.hora }}</p>
               <p class="cita-motivo">{{ cita.motivo }}</p>
             </div>
 
@@ -126,10 +126,10 @@
             <p>Actualiza tu información personal</p>
           </article>
 
-          <article class="tarjeta-accion clickable" routerLink="/ayuda">
-            <div class="accion-icono">❓</div>
-            <h3>Ayuda</h3>
-            <p>¿Necesitas asistencia?</p>
+          <article class="tarjeta-accion clickable" routerLink="/configuracion">
+            <div class="accion-icono">⚙️</div>
+            <h3>Configuración</h3>
+            <p>Ajusta tus preferencias</p>
           </article>
 
         </div>
