@@ -1,0 +1,213 @@
+<app-navbar></app-navbar>
+
+<div class="contenedor-configuracion">
+  <div class="contenido">
+    
+    <!-- Encabezado -->
+    <div class="encabezado">
+      <h1>⚙️ Configuración</h1>
+      <p>Administra la configuración de tu cuenta</p>
+    </div>
+
+    <!-- Secciones -->
+    <div class="secciones">
+
+      <!-- 1. CAMBIAR CONTRASEÑA -->
+      <div class="seccion">
+        <div class="seccion-header">
+          <div class="seccion-titulo">
+            <span class="seccion-icono">🔒</span>
+            <div>
+              <h2>Cambiar Contraseña</h2>
+              <p>Actualiza tu contraseña de acceso</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="seccion-contenido">
+          
+          <!-- Mensajes -->
+          <div *ngIf="mensajeExitoPassword" class="alerta alerta-exito">
+            ✅ {{ mensajeExitoPassword }}
+          </div>
+          
+          <div *ngIf="mensajeErrorPassword" class="alerta alerta-error">
+            ⚠️ {{ mensajeErrorPassword }}
+          </div>
+
+          <form [formGroup]="formularioPassword" (ngSubmit)="cambiarPassword()">
+            
+            <div class="grupo-formulario">
+              <label for="passwordActual">Contraseña Actual *</label>
+              <div class="input-password">
+                <input 
+                  [type]="mostrarPasswordActual ? 'text' : 'password'"
+                  id="passwordActual"
+                  formControlName="passwordActual"
+                  placeholder="••••••••"
+                  [class.error]="formularioPassword.get('passwordActual')?.invalid && formularioPassword.get('passwordActual')?.touched"
+                >
+                <button 
+                  type="button" 
+                  class="btn-toggle-password"
+                  (click)="togglePasswordActual()"
+                >
+                  {{ mostrarPasswordActual ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
+              <span class="mensaje-error" *ngIf="formularioPassword.get('passwordActual')?.invalid && formularioPassword.get('passwordActual')?.touched">
+                {{ obtenerMensajeErrorPassword('passwordActual') }}
+              </span>
+            </div>
+
+            <div class="grupo-formulario">
+              <label for="passwordNueva">Nueva Contraseña *</label>
+              <div class="input-password">
+                <input 
+                  [type]="mostrarPasswordNueva ? 'text' : 'password'"
+                  id="passwordNueva"
+                  formControlName="passwordNueva"
+                  placeholder="••••••••"
+                  [class.error]="formularioPassword.get('passwordNueva')?.invalid && formularioPassword.get('passwordNueva')?.touched"
+                >
+                <button 
+                  type="button" 
+                  class="btn-toggle-password"
+                  (click)="togglePasswordNueva()"
+                >
+                  {{ mostrarPasswordNueva ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
+              <span class="mensaje-error" *ngIf="formularioPassword.get('passwordNueva')?.invalid && formularioPassword.get('passwordNueva')?.touched">
+                {{ obtenerMensajeErrorPassword('passwordNueva') }}
+              </span>
+            </div>
+
+            <div class="grupo-formulario">
+              <label for="passwordConfirmar">Confirmar Nueva Contraseña *</label>
+              <div class="input-password">
+                <input 
+                  [type]="mostrarPasswordConfirmar ? 'text' : 'password'"
+                  id="passwordConfirmar"
+                  formControlName="passwordConfirmar"
+                  placeholder="••••••••"
+                  [class.error]="(!passwordsCoinciden() && formularioPassword.get('passwordConfirmar')?.touched)"
+                >
+                <button 
+                  type="button" 
+                  class="btn-toggle-password"
+                  (click)="togglePasswordConfirmar()"
+                >
+                  {{ mostrarPasswordConfirmar ? '👁️' : '👁️‍🗨️' }}
+                </button>
+              </div>
+              <span class="mensaje-error" *ngIf="!passwordsCoinciden() && formularioPassword.get('passwordConfirmar')?.touched">
+                Las contraseñas no coinciden
+              </span>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn-primary"
+              [disabled]="cambiandoPassword || formularioPassword.invalid"
+            >
+              <span *ngIf="!cambiandoPassword">🔒 Cambiar Contraseña</span>
+              <span *ngIf="cambiandoPassword">Cambiando...</span>
+            </button>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- 2. ELIMINAR CUENTA -->
+      <div class="seccion seccion-peligro">
+        <div class="seccion-header">
+          <div class="seccion-titulo">
+            <span class="seccion-icono">🗑️</span>
+            <div>
+              <h2>Eliminar Cuenta</h2>
+              <p>Desactiva permanentemente tu cuenta</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="seccion-contenido">
+          <p class="texto-advertencia">
+            ⚠️ Al eliminar tu cuenta, se desactivará permanentemente y no podrás acceder al sistema. Esta acción no se puede deshacer.
+          </p>
+          
+          <button class="btn-peligro" (click)="abrirModalEliminar()">
+            🗑️ Desactivar mi Cuenta
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. PREGUNTAS FRECUENTES Y AYUDA -->
+      <div class="seccion">
+        <div class="seccion-header">
+          <div class="seccion-titulo">
+            <span class="seccion-icono">❓</span>
+            <div>
+              <h2>Preguntas Frecuentes y Ayuda</h2>
+              <p>Encuentra respuestas a las dudas más comunes</p>
+            </div>
+          </div>
+          <button class="btn-expandir" (click)="toggleAyuda()">
+            {{ mostrarAyuda ? '▲' : '▼' }}
+          </button>
+        </div>
+
+        <div class="seccion-contenido" *ngIf="mostrarAyuda">
+          <div class="faq-lista">
+            
+            <div class="faq-item">
+              <h3>¿Cómo agendar una cita?</h3>
+              <p>Ve a "Buscar Doctores", selecciona un doctor, elige fecha y hora disponible, y confirma tu cita.</p>
+            </div>
+
+            <div class="faq-item">
+              <h3>¿Cómo cancelar una cita?</h3>
+              <p>En "Mis Citas", selecciona la cita que deseas cancelar y haz clic en el botón "Cancelar".</p>
+            </div>
+
+            <div class="faq-item">
+              <h3>¿Puedo cambiar mis datos personales?</h3>
+              <p>Sí, ve a "Mi Perfil" y haz clic en "Editar" para actualizar tu información.</p>
+            </div>
+
+            <div class="faq-item">
+              <h3>¿Olvidé mi contraseña, qué hago?</h3>
+              <p>En la pantalla de inicio de sesión, haz clic en "¿Olvidaste tu contraseña?" para recuperarla.</p>
+            </div>
+
+            <div class="faq-item">
+              <h3>¿Necesitas más ayuda?</h3>
+              <p>Contáctanos al correo: soporte@citasmedicas.com o llama al: 123-456-789</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Confirmar Eliminar -->
+<div class="modal-overlay" *ngIf="mostrarModalEliminar" (click)="cerrarModalEliminar()">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <h2>⚠️ ¿Estás seguro?</h2>
+    <p>Esta acción desactivará tu cuenta permanentemente. No podrás recuperar tu acceso.</p>
+    
+    <div class="modal-botones">
+      <button class="btn-cancelar" (click)="cerrarModalEliminar()" [disabled]="eliminandoCuenta">
+        Cancelar
+      </button>
+      <button class="btn-confirmar-peligro" (click)="confirmarEliminarCuenta()" [disabled]="eliminandoCuenta">
+        <span *ngIf="!eliminandoCuenta">Sí, Eliminar Cuenta</span>
+        <span *ngIf="eliminandoCuenta">Eliminando...</span>
+      </button>
+    </div>
+  </div>
+</div>

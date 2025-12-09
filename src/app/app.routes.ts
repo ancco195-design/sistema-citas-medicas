@@ -21,6 +21,15 @@ export const routes: Routes = [
     title: 'Autenticación'
   },
 
+  // Ruta de Configuración - Compartida para todos los roles autenticados
+  {
+    path: 'configuracion',
+    canActivate: [authGuard],
+    loadComponent: () => import('./caracteristicas/compartido/configuracion/configuracion')
+      .then(m => m.ConfiguracionComponent),
+    title: 'Configuración'
+  },
+
   // Módulo de Paciente - Protegido por authGuard y rolGuard
   {
     path: 'paciente',
@@ -56,4 +65,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'autenticacion'
   }
-];   
+];
