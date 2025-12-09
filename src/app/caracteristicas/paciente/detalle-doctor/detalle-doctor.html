@@ -30,8 +30,12 @@
       <!-- Header con foto y datos básicos -->
       <div class="header-doctor">
         <div class="foto-container">
+          <div *ngIf="!doctor.foto" class="foto-placeholder">
+            {{ obtenerIniciales() }}
+          </div>
           <img 
-            [src]="doctor.foto || 'https://via.placeholder.com/150/667eea/ffffff?text=Doctor'" 
+            *ngIf="doctor.foto"
+            [src]="doctor.foto" 
             [alt]="nombreCompleto"
             class="foto-doctor"
             (error)="onImageError($event)"
@@ -74,7 +78,8 @@
           </div>
           <div class="info-item">
             <span class="label">Teléfono:</span>
-            <span class="valor">{{ usuario.telefono }}</span>
+            <!-- ✨ PIPE APLICADO AQUÍ -->
+            <span class="valor">{{ usuario.telefono | telefono }}</span>
           </div>
           <div class="info-item">
             <span class="label">Consultorio:</span>

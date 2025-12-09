@@ -52,7 +52,6 @@ export class ListaDoctoresComponent implements OnInit, OnDestroy {
     this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
       .subscribe({
         next: async (doctores) => {
-          console.log('✅ Lista Doctores: Doctores actualizados en tiempo real:', doctores.length);
           this.doctores = doctores;
           this.doctoresFiltrados = [...doctores];
           

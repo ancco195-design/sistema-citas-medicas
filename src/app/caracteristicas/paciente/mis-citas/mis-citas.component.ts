@@ -7,11 +7,12 @@ import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.se
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
 import { Subscription } from 'rxjs';
+import { TiempoRelativoPipe } from '../../../nucleo/pipes/tiempo-relativo-pipe';
 
 @Component({
   selector: 'app-mis-citas',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, NavbarComponent, FormsModule, TiempoRelativoPipe], // ← AGREGADO
   templateUrl: './mis-citas.component.html',
   styleUrl: './mis-citas.component.css'
 })
@@ -20,7 +21,6 @@ export class MisCitasComponent implements OnInit, OnDestroy {
   private citasService = inject(CitasService);
   private router = inject(Router);
 
-  // ← NUEVO: Suscripción para limpiar
   private citasSubscription?: Subscription;
 
   citas: Cita[] = [];
@@ -49,13 +49,11 @@ export class MisCitasComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // ← IMPORTANTE: Limpiar suscripción
     if (this.citasSubscription) {
       this.citasSubscription.unsubscribe();
     }
   }
 
-  // ← NUEVO: Cargar citas en tiempo real
   cargarCitasRealTime() {
     const uid = this.autenticacionService.obtenerUid();
     
@@ -79,16 +77,13 @@ export class MisCitasComponent implements OnInit, OnDestroy {
       });
   }
 
-  // ← NUEVO: Método combinado para aplicar filtro y ordenamiento
   aplicarFiltroYOrdenamiento() {
-    // Primero aplicar filtro
     if (this.filtroEstado === 'todas') {
       this.citasFiltradas = [...this.citas];
     } else {
       this.citasFiltradas = this.citas.filter(cita => cita.estado === this.filtroEstado);
     }
     
-    // Luego aplicar ordenamiento
     this.aplicarOrdenamiento();
   }
 
@@ -151,7 +146,6 @@ export class MisCitasComponent implements OnInit, OnDestroy {
       
       if (resultado.exito) {
         alert('Cita cancelada exitosamente');
-        // Ya no necesitamos recargar manualmente, el observable lo hace automáticamente
         console.log('✅ Cita cancelada, el tiempo real refrescará los datos');
       } else {
         alert('Error al cancelar la cita: ' + resultado.mensaje);

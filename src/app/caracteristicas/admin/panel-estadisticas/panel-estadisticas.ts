@@ -75,7 +75,6 @@ export class PanelEstadisticasComponent implements OnInit, OnDestroy {
     this.citasSubscription = this.citasService.obtenerTodasCitasRealTime()
       .subscribe({
         next: (citas) => {
-          console.log('✅ Citas actualizadas en tiempo real:', citas.length);
           this.citasActuales = citas;
           this.totalCitas = citas.length;
           
@@ -96,7 +95,6 @@ export class PanelEstadisticasComponent implements OnInit, OnDestroy {
     this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
       .subscribe({
         next: (doctores) => {
-          console.log('✅ Doctores actualizados en tiempo real:', doctores.length);
           this.doctoresActuales = doctores;
           this.totalDoctores = doctores.length;
         },

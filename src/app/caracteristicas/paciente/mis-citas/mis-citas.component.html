@@ -95,7 +95,7 @@
             </div>
 
             <div class="detalle-item">
-              <span class="detalle-icono">🕒</span>
+              <span class="detalle-icono">🕑</span>
               <span>{{ cita.hora }}</span>
             </div>
 
@@ -125,7 +125,8 @@
           </button>
 
           <div class="info-creacion">
-            <small>Creada: {{ cita.fechaCreacion | date:'short' }}</small>
+            <!-- ✨ PIPE APLICADO AQUÍ -->
+            <small>Creada: {{ cita.fechaCreacion | tiempoRelativo }}</small>
           </div>
         </div>
 

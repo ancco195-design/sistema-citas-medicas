@@ -46,7 +46,6 @@ export class InicioDoctor implements OnInit, OnDestroy {
       this.citasSubscription = this.citasService.obtenerCitasPorDoctorRealTime(uid)
         .subscribe({
           next: (citas) => {
-            console.log('✅ Dashboard Doctor: Citas actualizadas en tiempo real:', citas.length);
             this.procesarDatos(citas);
           },
           error: (error) => {

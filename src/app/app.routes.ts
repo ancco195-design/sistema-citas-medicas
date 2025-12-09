@@ -63,6 +63,8 @@ export const routes: Routes = [
   // Ruta 404 - Página no encontrada
   {
     path: '**',
-    redirectTo: 'autenticacion'
+    loadComponent: () => import('./caracteristicas/compartido/pagina-404/pagina-404')
+      .then(m => m.Pagina404Component),  // ← Reemplaza con el nombre correcto del export
+    title: 'Página No Encontrada'
   }
 ];

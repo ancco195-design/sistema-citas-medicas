@@ -54,7 +54,6 @@ export class AgendaDoctor implements OnInit, OnDestroy {
       this.citasSubscription = this.citasService.obtenerCitasPorDoctorRealTime(uid)
         .subscribe({
           next: (citas) => {
-            console.log('✅ Agenda Doctor: Citas actualizadas en tiempo real:', citas.length);
             this.citas = citas;
             this.citasFiltradas = [...citas];
             this.extraerEspecialidades();

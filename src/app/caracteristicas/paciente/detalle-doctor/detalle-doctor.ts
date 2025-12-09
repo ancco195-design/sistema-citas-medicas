@@ -6,11 +6,12 @@ import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { Doctor } from '../../../nucleo/modelos/doctor.model';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
+import { TelefonoPipe } from '../../../nucleo/pipes/telefono-pipe';
 
 @Component({
   selector: 'app-detalle-doctor',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, TelefonoPipe], // ← AGREGADO
   templateUrl: './detalle-doctor.html',
   styleUrl: './detalle-doctor.css'
 })
@@ -70,6 +71,11 @@ export class DetalleDoctor implements OnInit {
   get estrellas(): number[] {
     const calificacion = this.doctor?.calificacion || 0;
     return Array(5).fill(0).map((_, i) => i < Math.round(calificacion) ? 1 : 0);
+  }
+
+  obtenerIniciales(): string {
+    if (!this.usuario) return 'DR';
+    return `${this.usuario.nombre.charAt(0)}${this.usuario.apellido.charAt(0)}`.toUpperCase();
   }
 
   obtenerDiasActivos(): string[] {

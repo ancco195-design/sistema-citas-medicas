@@ -65,7 +65,6 @@ export class InicioPacienteComponent implements OnInit, OnDestroy {
       this.citasSubscription = this.citasService.obtenerCitasPorPacienteRealTime(uid)
         .subscribe({
           next: (citas) => {
-            console.log('✅ Dashboard Paciente: Citas actualizadas en tiempo real:', citas.length);
             this.procesarCitas(citas);
             this.cargando = false;
           },
@@ -79,7 +78,6 @@ export class InicioPacienteComponent implements OnInit, OnDestroy {
       this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
         .subscribe({
           next: (doctores) => {
-            console.log('✅ Dashboard Paciente: Doctores actualizados en tiempo real:', doctores.length);
             this.totalDoctores = doctores.length;
           },
           error: (error) => {
