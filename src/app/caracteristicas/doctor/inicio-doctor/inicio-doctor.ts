@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { Cita } from '../../../nucleo/modelos/cita.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-inicio-doctor',
@@ -13,20 +14,45 @@ import { Cita } from '../../../nucleo/modelos/cita.model';
   templateUrl: './inicio-doctor.html',
   styleUrls: ['./inicio-doctor.css']
 })
-export class InicioDoctor implements OnInit {
+export class InicioDoctor implements OnInit, OnDestroy {
   private citasService = inject(CitasService);
   private authService = inject(AutenticacionService);
+
+  // ← NUEVO: Suscripción para limpiar al destruir
+  private citasSubscription?: Subscription;
 
   citasHoy = 0;
   pendientes = 0;
   totalPacientes = 0;
   fechaHoy = new Date();
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.cargarDatosRealTime();
+  }
+
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripción
+    if (this.citasSubscription) {
+      this.citasSubscription.unsubscribe();
+    }
+  }
+
+  // ← NUEVO: Cargar datos en tiempo real
+  cargarDatosRealTime() {
     const uid = this.authService.obtenerUid();
+    
     if (uid) {
-      const citas = await this.citasService.obtenerCitasPorDoctor(uid);
-      this.procesarDatos(citas);
+      // Suscribirse a las citas del doctor en tiempo real
+      this.citasSubscription = this.citasService.obtenerCitasPorDoctorRealTime(uid)
+        .subscribe({
+          next: (citas) => {
+            console.log('✅ Dashboard Doctor: Citas actualizadas en tiempo real:', citas.length);
+            this.procesarDatos(citas);
+          },
+          error: (error) => {
+            console.error('❌ Error al cargar citas del doctor:', error);
+          }
+        });
     }
   }
 
@@ -34,7 +60,7 @@ export class InicioDoctor implements OnInit {
     const hoyStr = new Date().toDateString();
     
     this.citasHoy = citas.filter(c => {
-      // Convertir Timestamp o Date a string para comparar solo la fecha (día/mes/año)
+      // Convertir Timestamp o Date a string para comparar solo la fecha
       const fechaCita = c.fecha instanceof Date ? c.fecha : new Date((c.fecha as any).seconds * 1000);
       return fechaCita.toDateString() === hoyStr && c.estado !== 'cancelada';
     }).length;

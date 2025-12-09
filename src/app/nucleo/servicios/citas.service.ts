@@ -1,12 +1,23 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, doc, addDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, CollectionReference, DocumentData, orderBy, Timestamp } from '@angular/fire/firestore';
+import { 
+  Firestore, 
+  collection, 
+  doc, 
+  addDoc, 
+  getDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  getDocs, 
+  CollectionReference, 
+  DocumentData, 
+  orderBy,
+  collectionData  // ← NUEVO: Para tiempo real
+} from '@angular/fire/firestore';
 import { Observable, from, map } from 'rxjs';
 import { Cita, CrearCita, ActualizarCita, FiltroCita, EstadoCita, DisponibilidadCita } from '../modelos/cita.model';
 
-/**
- * Servicio de Citas
- * Maneja las operaciones CRUD de citas médicas en Firestore
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -18,16 +29,87 @@ export class CitasService {
     this.citasCollection = collection(this.firestore, 'citas');
   }
 
+  // NUEVO: MÉTODOS CON OBSERVABLES (TIEMPO REAL)
   /**
-   * Crear una nueva cita
-   * @param datos Datos de la cita
-   * @param pacienteNombre Nombre del paciente
-   * @param doctorNombre Nombre del doctor
-   * @returns Promise con el resultado
+   * Obtener todas las citas en tiempo real
+   * @returns Observable con las citas que se actualiza automáticamente
    */
+  obtenerTodasCitasRealTime(): Observable<Cita[]> {
+    return collectionData(this.citasCollection, { idField: 'id' }).pipe(
+      map((citas: any[]) => 
+        citas.map(cita => this.convertirTimestamps(cita))
+      )
+    );
+  }
+
+  /**
+   * Obtener citas de un paciente en tiempo real
+   * @param pacienteId UID del paciente
+   * @returns Observable con las citas
+   */
+  obtenerCitasPorPacienteRealTime(pacienteId: string): Observable<Cita[]> {
+    const q = query(
+      this.citasCollection,
+      where('pacienteId', '==', pacienteId),
+      orderBy('fecha', 'desc')
+    );
+    
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((citas: any[]) => 
+        citas.map(cita => this.convertirTimestamps(cita))
+      )
+    );
+  }
+
+  /**
+   * Obtener citas de un doctor en tiempo real
+   * @param doctorId UID del doctor
+   * @returns Observable con las citas
+   */
+  obtenerCitasPorDoctorRealTime(doctorId: string): Observable<Cita[]> {
+    const q = query(
+      this.citasCollection,
+      where('doctorId', '==', doctorId),
+      orderBy('fecha', 'desc')
+    );
+    
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((citas: any[]) => 
+        citas.map(cita => this.convertirTimestamps(cita))
+      )
+    );
+  }
+
+  /**
+   * Método auxiliar para convertir Timestamps de Firestore a Date
+   */
+  private convertirTimestamps(cita: any): Cita {
+    const citaConvertida: any = { ...cita };
+    
+    // Convertir fecha si es Timestamp
+    if (cita.fecha && typeof cita.fecha === 'object' && 'seconds' in cita.fecha) {
+      citaConvertida.fecha = new Date(cita.fecha.seconds * 1000);
+    }
+    
+    // Convertir fechaCreacion si es Timestamp
+    if (cita.fechaCreacion && typeof cita.fechaCreacion === 'object' && 'seconds' in cita.fechaCreacion) {
+      citaConvertida.fechaCreacion = new Date(cita.fechaCreacion.seconds * 1000);
+    }
+    
+    // Convertir fechaActualizacion si es Timestamp
+    if (cita.fechaActualizacion && typeof cita.fechaActualizacion === 'object' && 'seconds' in cita.fechaActualizacion) {
+      citaConvertida.fechaActualizacion = new Date(cita.fechaActualizacion.seconds * 1000);
+    }
+    
+    return citaConvertida as Cita;
+  }
+
+
+  // MÉTODOS ORIGINALES (SE MANTIENEN)
+
+
   async crearCita(datos: CrearCita, pacienteNombre: string, doctorNombre: string): Promise<any> {
     try {
-      // Verificar disponibilidad antes de crear
       const disponibilidad = await this.verificarDisponibilidad(
         datos.doctorId,
         datos.fecha,
@@ -66,20 +148,12 @@ export class CitasService {
     }
   }
 
-  /**
-   * Verificar disponibilidad de un doctor en una fecha/hora
-   * @param doctorId UID del doctor
-   * @param fecha Fecha de la cita
-   * @param hora Hora de la cita
-   * @returns Promise con la disponibilidad
-   */
   async verificarDisponibilidad(
     doctorId: string, 
     fecha: Date, 
     hora: string
   ): Promise<DisponibilidadCita> {
     try {
-      // Buscar citas del doctor en la misma fecha y hora
       const q = query(
         this.citasCollection,
         where('doctorId', '==', doctorId),
@@ -119,11 +193,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener una cita por su ID
-   * @param citaId ID de la cita
-   * @returns Promise con la cita
-   */
   async obtenerCita(citaId: string): Promise<Cita | null> {
     try {
       const docSnap = await getDoc(doc(this.citasCollection, citaId));
@@ -138,11 +207,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener citas de un paciente
-   * @param pacienteId UID del paciente
-   * @returns Promise con las citas
-   */
   async obtenerCitasPorPaciente(pacienteId: string): Promise<Cita[]> {
     try {
       const q = query(
@@ -158,11 +222,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener citas de un doctor
-   * @param doctorId UID del doctor
-   * @returns Promise con las citas
-   */
   async obtenerCitasPorDoctor(doctorId: string): Promise<Cita[]> {
     try {
       const q = query(
@@ -178,11 +237,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener citas por fecha
-   * @param fecha Fecha a buscar
-   * @returns Promise con las citas
-   */
   async obtenerCitasPorFecha(fecha: Date): Promise<Cita[]> {
     try {
       const q = query(
@@ -198,11 +252,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener citas por estado
-   * @param estado Estado de la cita
-   * @returns Promise con las citas
-   */
   async obtenerCitasPorEstado(estado: EstadoCita): Promise<Cita[]> {
     try {
       const q = query(
@@ -218,37 +267,26 @@ export class CitasService {
     }
   }
 
-  /**
-   * Buscar citas con filtros múltiples
-   * @param filtro Filtros a aplicar
-   * @returns Promise con las citas
-   */
   async buscarCitas(filtro: FiltroCita): Promise<Cita[]> {
     try {
       let citas: Cita[] = [];
 
-      // Si hay filtro de paciente
       if (filtro.pacienteId) {
         citas = await this.obtenerCitasPorPaciente(filtro.pacienteId);
       }
-      // Si hay filtro de doctor
       else if (filtro.doctorId) {
         citas = await this.obtenerCitasPorDoctor(filtro.doctorId);
       }
-      // Si hay filtro de fecha
       else if (filtro.fecha) {
         citas = await this.obtenerCitasPorFecha(filtro.fecha);
       }
-      // Si hay filtro de estado
       else if (filtro.estado) {
         citas = await this.obtenerCitasPorEstado(filtro.estado);
       }
-      // Si no hay filtros específicos, obtener todas
       else {
         citas = await this.obtenerTodasCitas();
       }
 
-      // Aplicar filtros adicionales
       if (filtro.especialidad) {
         citas = citas.filter(c => c.especialidad === filtro.especialidad);
       }
@@ -267,10 +305,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Obtener todas las citas
-   * @returns Promise con todas las citas
-   */
   async obtenerTodasCitas(): Promise<Cita[]> {
     try {
       const querySnapshot = await getDocs(this.citasCollection);
@@ -290,12 +324,6 @@ export class CitasService {
     }
   }
 
-  /**
-   * Actualizar una cita
-   * @param citaId ID de la cita
-   * @param datos Datos a actualizar
-   * @returns Promise con el resultado
-   */
   async actualizarCita(citaId: string, datos: ActualizarCita): Promise<any> {
     try {
       await updateDoc(doc(this.citasCollection, citaId), {
@@ -315,30 +343,14 @@ export class CitasService {
     }
   }
 
-  /**
-   * Cancelar una cita
-   * @param citaId ID de la cita
-   * @returns Promise con el resultado
-   */
   async cancelarCita(citaId: string): Promise<any> {
     return await this.actualizarCita(citaId, { estado: 'cancelada' });
   }
 
-  /**
-   * Confirmar una cita
-   * @param citaId ID de la cita
-   * @returns Promise con el resultado
-   */
   async confirmarCita(citaId: string): Promise<any> {
     return await this.actualizarCita(citaId, { estado: 'confirmada' });
   }
 
-  /**
-   * Completar una cita
-   * @param citaId ID de la cita
-   * @param notas Notas del doctor (opcional)
-   * @returns Promise con el resultado
-   */
   async completarCita(citaId: string, notas?: string): Promise<any> {
     return await this.actualizarCita(citaId, { 
       estado: 'completada',
@@ -346,11 +358,6 @@ export class CitasService {
     });
   }
 
-  /**
-   * Eliminar una cita
-   * @param citaId ID de la cita
-   * @returns Promise con el resultado
-   */
   async eliminarCita(citaId: string): Promise<any> {
     try {
       await deleteDoc(doc(this.citasCollection, citaId));
@@ -366,35 +373,25 @@ export class CitasService {
     }
   }
 
-  /**
-   * Método auxiliar para ejecutar consultas y convertir a array
-   * @param q Query de Firestore
-   * @returns Promise con array de citas
-   */
   private async ejecutarConsultaCitas(q: any): Promise<Cita[]> {
     const querySnapshot = await getDocs(q);
     const citas: Cita[] = [];
     
     querySnapshot.forEach((docSnapshot) => {
       const data: any = docSnapshot.data();
-      
-      // Convertir Timestamps de Firestore a Date
       const cita: any = {
         id: docSnapshot.id,
         ...(data as object)
       };
       
-      // Convertir fecha si es Timestamp
       if (data['fecha'] && typeof data['fecha'] === 'object' && 'seconds' in data['fecha']) {
         cita.fecha = new Date(data['fecha'].seconds * 1000);
       }
       
-      // Convertir fechaCreacion si es Timestamp
       if (data['fechaCreacion'] && typeof data['fechaCreacion'] === 'object' && 'seconds' in data['fechaCreacion']) {
         cita.fechaCreacion = new Date(data['fechaCreacion'].seconds * 1000);
       }
       
-      // Convertir fechaActualizacion si es Timestamp
       if (data['fechaActualizacion'] && typeof data['fechaActualizacion'] === 'object' && 'seconds' in data['fechaActualizacion']) {
         cita.fechaActualizacion = new Date(data['fechaActualizacion'].seconds * 1000);
       }
@@ -405,10 +402,6 @@ export class CitasService {
     return citas;
   }
 
-  /**
-   * Obtener estadísticas de citas
-   * @returns Promise con estadísticas
-   */
   async obtenerEstadisticas(): Promise<any> {
     try {
       const todasCitas = await this.obtenerTodasCitas();

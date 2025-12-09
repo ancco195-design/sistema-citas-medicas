@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { Cita } from '../../../nucleo/modelos/cita.model';
 import { Doctor } from '../../../nucleo/modelos/doctor.model';
+import { Subscription } from 'rxjs';
 
 interface EstadisticaCita {
   estado: string;
@@ -31,9 +32,13 @@ interface EstadisticaDoctor {
   templateUrl: './panel-estadisticas.html',
   styleUrl: './panel-estadisticas.css'
 })
-export class PanelEstadisticasComponent implements OnInit {
+export class PanelEstadisticasComponent implements OnInit, OnDestroy {
   private citasService = inject(CitasService);
   private doctoresService = inject(DoctoresService);
+
+  // ← NUEVO: Suscripciones para limpiar al destruir el componente
+  private citasSubscription?: Subscription;
+  private doctoresSubscription?: Subscription;
 
   cargando = true;
   
@@ -44,36 +49,61 @@ export class PanelEstadisticasComponent implements OnInit {
   estadisticasPorEspecialidad: EstadisticaEspecialidad[] = [];
   estadisticasPorDoctor: EstadisticaDoctor[] = [];
 
-  async ngOnInit() {
-    await this.cargarEstadisticas();
+  // Variables para almacenar los datos en tiempo real
+  private citasActuales: Cita[] = [];
+  private doctoresActuales: Doctor[] = [];
+
+  ngOnInit() {
+    this.cargarEstadisticasRealTime();
   }
 
-  async cargarEstadisticas() {
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripciones para evitar memory leaks
+    if (this.citasSubscription) {
+      this.citasSubscription.unsubscribe();
+    }
+    if (this.doctoresSubscription) {
+      this.doctoresSubscription.unsubscribe();
+    }
+  }
+
+  // ← NUEVO: Cargar estadísticas con suscripciones en tiempo real
+  cargarEstadisticasRealTime() {
     this.cargando = true;
 
-    try {
-      // Obtener todas las citas
-      const citas = await this.citasService.obtenerTodasCitas();
-      this.totalCitas = citas.length;
+    // Suscribirse a las citas en tiempo real
+    this.citasSubscription = this.citasService.obtenerTodasCitasRealTime()
+      .subscribe({
+        next: (citas) => {
+          console.log('✅ Citas actualizadas en tiempo real:', citas.length);
+          this.citasActuales = citas;
+          this.totalCitas = citas.length;
+          
+          // Recalcular estadísticas con los nuevos datos
+          this.calcularEstadisticasPorEstado(citas);
+          this.calcularEstadisticasPorEspecialidad(citas);
+          this.calcularEstadisticasPorDoctor(citas);
+          
+          this.cargando = false;
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar citas:', error);
+          this.cargando = false;
+        }
+      });
 
-      // Obtener todos los doctores
-      const doctores = await this.doctoresService.obtenerTodosDoctores();
-      this.totalDoctores = doctores.length;
-
-      // Calcular estadísticas por estado
-      this.calcularEstadisticasPorEstado(citas);
-
-      // Calcular estadísticas por especialidad
-      this.calcularEstadisticasPorEspecialidad(citas);
-
-      // Calcular estadísticas por doctor
-      await this.calcularEstadisticasPorDoctor(citas);
-
-    } catch (error) {
-      console.error('Error al cargar estadísticas:', error);
-    } finally {
-      this.cargando = false;
-    }
+    // Suscribirse a los doctores en tiempo real
+    this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
+      .subscribe({
+        next: (doctores) => {
+          console.log('✅ Doctores actualizados en tiempo real:', doctores.length);
+          this.doctoresActuales = doctores;
+          this.totalDoctores = doctores.length;
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar doctores:', error);
+        }
+      });
   }
 
   calcularEstadisticasPorEstado(citas: Cita[]) {
@@ -109,10 +139,10 @@ export class PanelEstadisticasComponent implements OnInit {
     this.estadisticasPorEspecialidad = Array.from(especialidadesMap.entries())
       .map(([especialidad, cantidad]) => ({ especialidad, cantidad }))
       .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5); // Top 5 especialidades
+      .slice(0, 5);
   }
 
-  async calcularEstadisticasPorDoctor(citas: Cita[]) {
+  calcularEstadisticasPorDoctor(citas: Cita[]) {
     const doctoresMap = new Map<string, number>();
 
     citas.forEach(cita => {
@@ -134,7 +164,7 @@ export class PanelEstadisticasComponent implements OnInit {
 
     this.estadisticasPorDoctor = estadisticas
       .sort((a, b) => b.cantidad - a.cantidad)
-      .slice(0, 5); // Top 5 doctores
+      .slice(0, 5);
   }
 
   obtenerNombreEstado(estado: string): string {

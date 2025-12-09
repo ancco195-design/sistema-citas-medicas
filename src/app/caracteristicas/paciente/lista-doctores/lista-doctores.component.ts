@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,11 +8,8 @@ import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { Doctor } from '../../../nucleo/modelos/doctor.model';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
 import { ESPECIALIDADES_COMUNES } from '../../../nucleo/modelos/especialidad.model';
+import { Subscription } from 'rxjs';
 
-/**
- * Componente Lista de Doctores
- * Muestra todos los doctores disponibles con filtros
- */
 @Component({
   selector: 'app-lista-doctores',
   standalone: true,
@@ -20,10 +17,13 @@ import { ESPECIALIDADES_COMUNES } from '../../../nucleo/modelos/especialidad.mod
   templateUrl: './lista-doctores.component.html',
   styleUrl: './lista-doctores.component.css'
 })
-export class ListaDoctoresComponent implements OnInit {
+export class ListaDoctoresComponent implements OnInit, OnDestroy {
   private doctoresService = inject(DoctoresService);
   private usuariosService = inject(UsuariosService);
   private router = inject(Router);
+
+  // ← NUEVO: Suscripción para limpiar
+  private doctoresSubscription?: Subscription;
 
   doctores: Doctor[] = [];
   doctoresFiltrados: Doctor[] = [];
@@ -34,44 +34,54 @@ export class ListaDoctoresComponent implements OnInit {
   filtroEspecialidad = '';
   filtroBusqueda = '';
   
-  cargando = true; // ✅ CAMBIADO A TRUE
+  cargando = true;
 
   ngOnInit() {
-    this.cargarDoctores();
+    this.cargarDoctoresRealTime();
   }
 
-  /**
-   * Cargar todos los doctores
-   */
-  async cargarDoctores() {
-    this.cargando = true;
-
-    try {
-      // Cargar doctores desde Firestore
-      this.doctores = await this.doctoresService.obtenerTodosDoctores();
-      this.doctoresFiltrados = [...this.doctores];
-
-      // Cargar información de usuarios en paralelo
-      const promesasUsuarios = this.doctores.map(doctor =>
-        this.usuariosService.obtenerUsuario(doctor.uid).then(usuario => {
-          if (usuario) {
-            this.usuariosDoctores.set(doctor.uid, usuario);
-          }
-        })
-      );
-
-      await Promise.all(promesasUsuarios);
-
-    } catch (error) {
-      console.error('Error al cargar doctores:', error);
-    } finally {
-      this.cargando = false; // ✅ Ocultar loader cuando termine
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripción
+    if (this.doctoresSubscription) {
+      this.doctoresSubscription.unsubscribe();
     }
   }
 
-  /**
-   * Aplicar filtros
-   */
+  // ← NUEVO: Cargar doctores en tiempo real
+  cargarDoctoresRealTime() {
+    this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
+      .subscribe({
+        next: async (doctores) => {
+          console.log('✅ Lista Doctores: Doctores actualizados en tiempo real:', doctores.length);
+          this.doctores = doctores;
+          this.doctoresFiltrados = [...doctores];
+          
+          // Cargar información de usuarios en paralelo
+          await this.cargarUsuariosDoctores();
+          
+          this.aplicarFiltros();
+          this.cargando = false;
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar doctores:', error);
+          this.cargando = false;
+        }
+      });
+  }
+
+  // ← NUEVO: Método para cargar usuarios de los doctores
+  async cargarUsuariosDoctores() {
+    const promesasUsuarios = this.doctores.map(doctor =>
+      this.usuariosService.obtenerUsuario(doctor.uid).then(usuario => {
+        if (usuario) {
+          this.usuariosDoctores.set(doctor.uid, usuario);
+        }
+      })
+    );
+
+    await Promise.all(promesasUsuarios);
+  }
+
   aplicarFiltros() {
     this.doctoresFiltrados = this.doctores.filter(doctor => {
       const usuario = this.usuariosDoctores.get(doctor.uid);
@@ -89,18 +99,12 @@ export class ListaDoctoresComponent implements OnInit {
     });
   }
 
-  /**
-   * Limpiar filtros
-   */
   limpiarFiltros() {
     this.filtroEspecialidad = '';
     this.filtroBusqueda = '';
     this.aplicarFiltros();
   }
 
-  /**
-   * Obtener nombre completo del doctor
-   */
   obtenerNombreDoctor(uid: string): string {
     const usuario = this.usuariosDoctores.get(uid);
     if (usuario) {
@@ -109,17 +113,11 @@ export class ListaDoctoresComponent implements OnInit {
     return 'Doctor';
   }
 
-  /**
-   * Obtener foto del doctor
-   */
   obtenerFotoDoctor(uid: string): string {
     const usuario = this.usuariosDoctores.get(uid);
     return usuario?.foto || '';
   }
 
-  /**
-   * Obtener iniciales del doctor
-   */
   obtenerIniciales(uid: string): string {
     const usuario = this.usuariosDoctores.get(uid);
     if (usuario) {
@@ -128,23 +126,14 @@ export class ListaDoctoresComponent implements OnInit {
     return 'DR';
   }
 
-  /**
-   * Navegar a detalle del doctor
-   */
   verDetalle(doctor: Doctor) {
     this.router.navigate(['/paciente/doctores', doctor.uid]);
   }
 
-  /**
-   * Navegar a agendar cita
-   */
   agendarCita(doctor: Doctor) {
     this.router.navigate(['/paciente/agendar-cita', doctor.uid]);
   }
 
-  /**
-   * Obtener ícono de especialidad
-   */
   obtenerIconoEspecialidad(especialidad: string): string {
     const esp = this.especialidades.find(e => 
       e.nombre.toLowerCase() === especialidad.toLowerCase()
@@ -152,9 +141,6 @@ export class ListaDoctoresComponent implements OnInit {
     return esp?.icono || '🩺';
   }
 
-  /**
-   * Obtener estrellas de calificación
-   */
   obtenerEstrellas(calificacion?: number): string {
     const cal = calificacion || 0;
     const estrellas = Math.round(cal);

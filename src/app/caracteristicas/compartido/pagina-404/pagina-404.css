@@ -1,0 +1,118 @@
+.contenedor-404 {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+}
+
+.contenido-404 {
+    text-align: center;
+    background: white;
+    padding: 4rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+    opacity: 0;
+    transform: translateY(-20px);
+    }
+    to {
+    opacity: 1;
+    transform: translateY(0);
+    }
+}
+
+.numero-404 {
+    font-size: 8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    line-height: 1;
+}
+
+h1 {
+    color: #333;
+    font-size: 2rem;
+    margin: 1.5rem 0 1rem 0;
+    font-weight: 700;
+}
+
+p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0 0 2.5rem 0;
+    line-height: 1.6;
+}
+
+.acciones {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.btn-secondary {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+    background: #f8f9ff;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    .contenido-404 {
+    padding: 3rem 2rem;
+    }
+
+    .numero-404 {
+    font-size: 6rem;
+    }
+
+    h1 {
+    font-size: 1.5rem;
+    }
+
+    .acciones {
+    flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+    width: 100%;
+    }
+}

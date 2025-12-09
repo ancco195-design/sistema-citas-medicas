@@ -1,12 +1,22 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, CollectionReference, DocumentData, orderBy } from '@angular/fire/firestore';
+import { 
+  Firestore, 
+  collection, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  getDocs, 
+  CollectionReference, 
+  DocumentData,
+  collectionData  // ← NUEVO: Para tiempo real
+} from '@angular/fire/firestore';
 import { Observable, from, map } from 'rxjs';
 import { Doctor, CrearDoctor, FiltroDoctor } from '../modelos/doctor.model';
 
-/**
- * Servicio de Doctores
- * Maneja las operaciones CRUD de doctores en Firestore
- */
 @Injectable({
   providedIn: 'root'
 })
@@ -17,12 +27,15 @@ export class DoctoresService {
   constructor() {
     this.doctoresCollection = collection(this.firestore, 'doctores');
   }
-
+  // NUEVO: MÉTODO CON OBSERVABLE (TIEMPO REAL)
   /**
-   * Crear un nuevo doctor en Firestore
-   * @param datos Datos del doctor
-   * @returns Promise con el resultado
+   * Obtener todos los doctores en tiempo real
+   * @returns Observable con los doctores que se actualiza automáticamente
    */
+  obtenerTodosDoctoresRealTime(): Observable<Doctor[]> {
+    return collectionData(this.doctoresCollection, { idField: 'uid' }) as Observable<Doctor[]>;
+  }
+  // MÉTODOS ORIGINALES (SE MANTIENEN)
   async crearDoctor(datos: CrearDoctor): Promise<any> {
     try {
       const nuevoDoctor: Doctor = {
@@ -46,11 +59,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Obtener un doctor por su UID
-   * @param uid UID del doctor
-   * @returns Observable con el doctor
-   */
   obtenerDoctorPorId(uid: string): Observable<Doctor | null> {
     return from(getDoc(doc(this.doctoresCollection, uid))).pipe(
       map(docSnap => {
@@ -62,11 +70,6 @@ export class DoctoresService {
     );
   }
 
-  /**
-   * Obtener un doctor por su UID (Promise)
-   * @param uid UID del doctor
-   * @returns Promise con el doctor
-   */
   async obtenerDoctor(uid: string): Promise<Doctor | null> {
     try {
       const docSnap = await getDoc(doc(this.doctoresCollection, uid));
@@ -80,10 +83,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Obtener todos los doctores
-   * @returns Promise con la lista de doctores
-   */
   async obtenerTodosDoctores(): Promise<Doctor[]> {
     try {
       const querySnapshot = await getDocs(this.doctoresCollection);
@@ -100,11 +99,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Obtener doctores por especialidad
-   * @param especialidad Especialidad a filtrar
-   * @returns Promise con la lista de doctores
-   */
   async obtenerDoctoresPorEspecialidad(especialidad: string): Promise<Doctor[]> {
     try {
       const q = query(
@@ -125,23 +119,16 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Buscar doctores con filtros
-   * @param filtro Filtros a aplicar
-   * @returns Promise con la lista de doctores
-   */
   async buscarDoctores(filtro: FiltroDoctor): Promise<Doctor[]> {
     try {
       let doctores = await this.obtenerTodosDoctores();
 
-      // Filtrar por especialidad
       if (filtro.especialidad) {
         doctores = doctores.filter(d => 
           d.especialidad.toLowerCase().includes(filtro.especialidad!.toLowerCase())
         );
       }
 
-      // Filtrar por nombre (buscar en UID, necesitarías también el nombre)
       if (filtro.nombre) {
         doctores = doctores.filter(d => 
           d.uid.toLowerCase().includes(filtro.nombre!.toLowerCase())
@@ -155,12 +142,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Actualizar datos de un doctor
-   * @param uid UID del doctor
-   * @param datos Datos a actualizar
-   * @returns Promise con el resultado
-   */
   async actualizarDoctor(uid: string, datos: Partial<Doctor>): Promise<any> {
     try {
       await updateDoc(doc(this.doctoresCollection, uid), datos);
@@ -176,11 +157,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Eliminar un doctor
-   * @param uid UID del doctor
-   * @returns Promise con el resultado
-   */
   async eliminarDoctor(uid: string): Promise<any> {
     try {
       await deleteDoc(doc(this.doctoresCollection, uid));
@@ -196,11 +172,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Incrementar el contador de citas de un doctor
-   * @param uid UID del doctor
-   * @returns Promise con el resultado
-   */
   async incrementarNumeroCitas(uid: string): Promise<any> {
     try {
       const doctor = await this.obtenerDoctor(uid);
@@ -218,12 +189,6 @@ export class DoctoresService {
     }
   }
 
-  /**
-   * Actualizar calificación de un doctor
-   * @param uid UID del doctor
-   * @param calificacion Nueva calificación (1-5)
-   * @returns Promise con el resultado
-   */
   async actualizarCalificacion(uid: string, calificacion: number): Promise<any> {
     try {
       if (calificacion < 1 || calificacion > 5) {

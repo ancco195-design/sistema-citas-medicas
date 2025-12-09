@@ -30,6 +30,24 @@
       </button>
     </div>
 
+    <!-- Ordenamiento -->
+    <div class="seccion-ordenamiento" *ngIf="!cargando && citasFiltradas.length > 0">
+      <label for="ordenamiento">📊 Ordenar por:</label>
+      <select 
+        id="ordenamiento"
+        [(ngModel)]="ordenamiento"
+        (ngModelChange)="cambiarOrdenamiento()"
+        class="select-ordenamiento"
+      >
+        <option *ngFor="let opcion of opcionesOrdenamiento" [value]="opcion.valor">
+          {{ opcion.texto }}
+        </option>
+      </select>
+      <span class="contador-resultados">
+        Mostrando {{ citasFiltradas.length }} {{ citasFiltradas.length === 1 ? 'cita' : 'citas' }}
+      </span>
+    </div>
+
     <!-- Cargando -->
     <div *ngIf="cargando" class="cargando">
       <div class="spinner"></div>
@@ -38,7 +56,7 @@
 
     <!-- Sin Citas -->
     <div *ngIf="!cargando && citasFiltradas.length === 0" class="sin-citas">
-      <div class="sin-citas-icono">📭</div>
+      <div class="sin-citas-icono">🔭</div>
       <h3>No tienes citas {{ filtroEstado === 'todas' ? '' : filtroEstado + 's' }}</h3>
       <p>Agenda tu primera cita con uno de nuestros especialistas</p>
       <button class="btn-agendar" (click)="agendarNuevaCita()">
@@ -77,7 +95,7 @@
             </div>
 
             <div class="detalle-item">
-              <span class="detalle-icono">🕐</span>
+              <span class="detalle-icono">🕒</span>
               <span>{{ cita.hora }}</span>
             </div>
 

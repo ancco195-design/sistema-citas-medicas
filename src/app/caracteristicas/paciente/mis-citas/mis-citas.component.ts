@@ -1,34 +1,34 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
+import { Subscription } from 'rxjs';
 
-/**
- * Componente Mis Citas
- * Muestra todas las citas del paciente con filtros
- */
 @Component({
   selector: 'app-mis-citas',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, FormsModule],
   templateUrl: './mis-citas.component.html',
   styleUrl: './mis-citas.component.css'
 })
-export class MisCitasComponent implements OnInit {
+export class MisCitasComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);
   private citasService = inject(CitasService);
   private router = inject(Router);
 
+  // ← NUEVO: Suscripción para limpiar
+  private citasSubscription?: Subscription;
+
   citas: Cita[] = [];
   citasFiltradas: Cita[] = [];
   filtroEstado: EstadoCita | 'todas' = 'todas';
-  cargando = false;
+  ordenamiento: 'fecha-desc' | 'fecha-asc' | 'doctor' | 'especialidad' = 'fecha-desc';
+  cargando = true;
 
-  // Estados disponibles
   estadosDisponibles: { valor: EstadoCita | 'todas'; texto: string; icono: string }[] = [
     { valor: 'todas', texto: 'Todas', icono: '📋' },
     { valor: 'pendiente', texto: 'Pendientes', icono: '🕐' },
@@ -37,73 +37,108 @@ export class MisCitasComponent implements OnInit {
     { valor: 'cancelada', texto: 'Canceladas', icono: '❌' }
   ];
 
-  ngOnInit() {
-    this.cargarCitas();
+  opcionesOrdenamiento = [
+    { valor: 'fecha-desc', texto: 'Fecha (más reciente)' },
+    { valor: 'fecha-asc', texto: 'Fecha (más antigua)' },
+    { valor: 'doctor', texto: 'Nombre del doctor' },
+    { valor: 'especialidad', texto: 'Especialidad' }
+  ];
 
-    // Escuchar cuando el usuario regresa al componente
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.cargarCitas();
-    });
+  ngOnInit() {
+    this.cargarCitasRealTime();
   }
 
-  /**
-   * Cargar citas del paciente
-   */
-  async cargarCitas() {
-    this.cargando = true;
-
-    try {
-      const uid = this.autenticacionService.obtenerUid();
-      
-      if (!uid) {
-        this.router.navigate(['/autenticacion/inicio-sesion']);
-        return;
-      }
-
-      this.citas = await this.citasService.obtenerCitasPorPaciente(uid);
-      this.citasFiltradas = [...this.citas];
-      
-      // Ordenar por fecha (más recientes primero)
-      this.ordenarPorFecha();
-
-    } catch (error) {
-      console.error('Error al cargar citas:', error);
-    } finally {
-      this.cargando = false;
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripción
+    if (this.citasSubscription) {
+      this.citasSubscription.unsubscribe();
     }
   }
 
-  /**
-   * Filtrar citas por estado
-   */
-  filtrarPorEstado(estado: EstadoCita | 'todas') {
-    this.filtroEstado = estado;
+  // ← NUEVO: Cargar citas en tiempo real
+  cargarCitasRealTime() {
+    const uid = this.autenticacionService.obtenerUid();
     
-    if (estado === 'todas') {
+    if (!uid) {
+      this.router.navigate(['/autenticacion/inicio-sesion']);
+      return;
+    }
+
+    this.citasSubscription = this.citasService.obtenerCitasPorPacienteRealTime(uid)
+      .subscribe({
+        next: (citas) => {
+          console.log('✅ Mis Citas: Citas actualizadas en tiempo real:', citas.length);
+          this.citas = citas;
+          this.aplicarFiltroYOrdenamiento();
+          this.cargando = false;
+        },
+        error: (error) => {
+          console.error('❌ Error al cargar citas:', error);
+          this.cargando = false;
+        }
+      });
+  }
+
+  // ← NUEVO: Método combinado para aplicar filtro y ordenamiento
+  aplicarFiltroYOrdenamiento() {
+    // Primero aplicar filtro
+    if (this.filtroEstado === 'todas') {
       this.citasFiltradas = [...this.citas];
     } else {
-      this.citasFiltradas = this.citas.filter(cita => cita.estado === estado);
+      this.citasFiltradas = this.citas.filter(cita => cita.estado === this.filtroEstado);
     }
     
-    this.ordenarPorFecha();
+    // Luego aplicar ordenamiento
+    this.aplicarOrdenamiento();
   }
 
-  /**
-   * Ordenar citas por fecha
-   */
-  ordenarPorFecha() {
-    this.citasFiltradas.sort((a, b) => {
-      const fechaA = new Date(a.fecha).getTime();
-      const fechaB = new Date(b.fecha).getTime();
-      return fechaB - fechaA; // Más recientes primero
-    });
+  filtrarPorEstado(estado: EstadoCita | 'todas') {
+    this.filtroEstado = estado;
+    this.aplicarFiltroYOrdenamiento();
   }
 
-  /**
-   * Cancelar una cita
-   */
+  cambiarOrdenamiento() {
+    this.aplicarOrdenamiento();
+  }
+
+  aplicarOrdenamiento() {
+    switch (this.ordenamiento) {
+      case 'fecha-desc':
+        this.citasFiltradas.sort((a, b) => {
+          const fechaA = this.convertirFecha(a.fecha).getTime();
+          const fechaB = this.convertirFecha(b.fecha).getTime();
+          return fechaB - fechaA;
+        });
+        break;
+
+      case 'fecha-asc':
+        this.citasFiltradas.sort((a, b) => {
+          const fechaA = this.convertirFecha(a.fecha).getTime();
+          const fechaB = this.convertirFecha(b.fecha).getTime();
+          return fechaA - fechaB;
+        });
+        break;
+
+      case 'doctor':
+        this.citasFiltradas.sort((a, b) => 
+          a.doctorNombre.localeCompare(b.doctorNombre)
+        );
+        break;
+
+      case 'especialidad':
+        this.citasFiltradas.sort((a, b) => 
+          a.especialidad.localeCompare(b.especialidad)
+        );
+        break;
+    }
+  }
+
+  private convertirFecha(fecha: any): Date {
+    if (fecha instanceof Date) return fecha;
+    if (fecha?.seconds) return new Date(fecha.seconds * 1000);
+    return new Date(fecha);
+  }
+
   async cancelarCita(cita: Cita) {
     if (!cita.id) return;
 
@@ -116,7 +151,8 @@ export class MisCitasComponent implements OnInit {
       
       if (resultado.exito) {
         alert('Cita cancelada exitosamente');
-        await this.cargarCitas();
+        // Ya no necesitamos recargar manualmente, el observable lo hace automáticamente
+        console.log('✅ Cita cancelada, el tiempo real refrescará los datos');
       } else {
         alert('Error al cancelar la cita: ' + resultado.mensaje);
       }
@@ -126,26 +162,20 @@ export class MisCitasComponent implements OnInit {
     }
   }
 
-  /**
-   * Verificar si una cita se puede cancelar
-   */
   puedeCancelar(cita: Cita): boolean {
     if (cita.estado !== 'pendiente' && cita.estado !== 'confirmada') {
       return false;
     }
 
-    const fechaCita = new Date(cita.fecha);
+    const fechaCita = this.convertirFecha(cita.fecha);
     const hoy = new Date();
     
     return fechaCita > hoy;
   }
 
-  /**
-   * Formatear fecha
-   */
   formatearFecha(fecha: Date): string {
     try {
-      const fechaObj = new Date(fecha);
+      const fechaObj = this.convertirFecha(fecha);
       return fechaObj.toLocaleDateString('es-PE', {
         weekday: 'long',
         year: 'numeric',
@@ -157,9 +187,6 @@ export class MisCitasComponent implements OnInit {
     }
   }
 
-  /**
-   * Obtener badge de estado
-   */
   obtenerBadgeEstado(estado: string): string {
     const badges: { [key: string]: string } = {
       'pendiente': '🕐 Pendiente',
@@ -171,16 +198,10 @@ export class MisCitasComponent implements OnInit {
     return badges[estado] || estado;
   }
 
-  /**
-   * Obtener clase CSS según estado
-   */
   obtenerClaseEstado(estado: string): string {
     return `estado-${estado}`;
   }
 
-  /**
-   * Contar citas por estado
-   */
   contarPorEstado(estado: EstadoCita | 'todas'): number {
     if (estado === 'todas') {
       return this.citas.length;
@@ -188,9 +209,6 @@ export class MisCitasComponent implements OnInit {
     return this.citas.filter(c => c.estado === estado).length;
   }
 
-  /**
-   * Navegar a agendar nueva cita
-   */
   agendarNuevaCita() {
     this.router.navigate(['/paciente/doctores']);
   }

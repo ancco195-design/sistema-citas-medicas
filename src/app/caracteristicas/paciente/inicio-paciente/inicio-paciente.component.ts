@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
@@ -8,6 +8,7 @@ import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
 import { Cita } from '../../../nucleo/modelos/cita.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-inicio-paciente',
@@ -16,12 +17,16 @@ import { Cita } from '../../../nucleo/modelos/cita.model';
   templateUrl: './inicio-paciente.component.html',
   styleUrl: './inicio-paciente.component.css'
 })
-export class InicioPacienteComponent implements OnInit {
+export class InicioPacienteComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);
   private usuariosService = inject(UsuariosService);
   private citasService = inject(CitasService);
   private doctoresService = inject(DoctoresService);
   private router = inject(Router);
+
+  // ← NUEVO: Suscripciones para limpiar
+  private citasSubscription?: Subscription;
+  private doctoresSubscription?: Subscription;
 
   usuario: Usuario | null = null;
   citasActivas: Cita[] = [];
@@ -30,11 +35,21 @@ export class InicioPacienteComponent implements OnInit {
   cargando = true;
 
   ngOnInit() {
-    this.cargarDatos();
+    this.cargarDatosRealTime();
   }
 
-  async cargarDatos() {
-    this.cargando = true;
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripciones
+    if (this.citasSubscription) {
+      this.citasSubscription.unsubscribe();
+    }
+    if (this.doctoresSubscription) {
+      this.doctoresSubscription.unsubscribe();
+    }
+  }
+
+  // ← NUEVO: Cargar datos en tiempo real
+  async cargarDatosRealTime() {
     const uid = this.autenticacionService.obtenerUid();
 
     if (!uid) {
@@ -43,39 +58,63 @@ export class InicioPacienteComponent implements OnInit {
     }
 
     try {
+      // Cargar usuario (esto no necesita tiempo real)
       this.usuario = await this.usuariosService.obtenerUsuario(uid);
 
-      const todasCitas = await this.citasService.obtenerCitasPorPaciente(uid);
-      
-      const ahora = new Date();
-      const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+      // Suscribirse a citas en tiempo real
+      this.citasSubscription = this.citasService.obtenerCitasPorPacienteRealTime(uid)
+        .subscribe({
+          next: (citas) => {
+            console.log('✅ Dashboard Paciente: Citas actualizadas en tiempo real:', citas.length);
+            this.procesarCitas(citas);
+            this.cargando = false;
+          },
+          error: (error) => {
+            console.error('❌ Error al cargar citas del paciente:', error);
+            this.cargando = false;
+          }
+        });
 
-      this.citasActivas = todasCitas.filter(cita => {
-        const fechaCita = this.convertirFecha(cita.fecha);
-        const fechaSoloCita = new Date(fechaCita.getFullYear(), fechaCita.getMonth(), fechaCita.getDate());
-        
-        const esEstadoActivo = cita.estado === 'pendiente' || cita.estado === 'confirmada';
-        const esFechaFutura = fechaSoloCita.getTime() >= hoy.getTime();
-        
-        return esEstadoActivo && esFechaFutura;
-      });
-
-      this.proximasCitas = [...this.citasActivas]
-        .sort((a, b) => {
-          const fechaA = this.convertirFecha(a.fecha);
-          const fechaB = this.convertirFecha(b.fecha);
-          return fechaA.getTime() - fechaB.getTime();
-        })
-        .slice(0, 3);
-
-      const doctores = await this.doctoresService.obtenerTodosDoctores();
-      this.totalDoctores = doctores.length;
+      // Suscribirse a doctores en tiempo real
+      this.doctoresSubscription = this.doctoresService.obtenerTodosDoctoresRealTime()
+        .subscribe({
+          next: (doctores) => {
+            console.log('✅ Dashboard Paciente: Doctores actualizados en tiempo real:', doctores.length);
+            this.totalDoctores = doctores.length;
+          },
+          error: (error) => {
+            console.error('❌ Error al cargar doctores:', error);
+          }
+        });
 
     } catch (error) {
       console.error('Error al cargar datos:', error);
-    } finally {
       this.cargando = false;
     }
+  }
+
+  // ← NUEVO: Procesar citas cuando se actualizan
+  procesarCitas(todasCitas: Cita[]) {
+    const ahora = new Date();
+    const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+
+    this.citasActivas = todasCitas.filter(cita => {
+      const fechaCita = this.convertirFecha(cita.fecha);
+      const fechaSoloCita = new Date(fechaCita.getFullYear(), fechaCita.getMonth(), fechaCita.getDate());
+      
+      const esEstadoActivo = cita.estado === 'pendiente' || cita.estado === 'confirmada';
+      const esFechaFutura = fechaSoloCita.getTime() >= hoy.getTime();
+      
+      return esEstadoActivo && esFechaFutura;
+    });
+
+    this.proximasCitas = [...this.citasActivas]
+      .sort((a, b) => {
+        const fechaA = this.convertirFecha(a.fecha);
+        const fechaB = this.convertirFecha(b.fecha);
+        return fechaA.getTime() - fechaB.getTime();
+      })
+      .slice(0, 3);
   }
 
   private convertirFecha(fecha: any): Date {
@@ -117,7 +156,7 @@ export class InicioPacienteComponent implements OnInit {
 
   obtenerBadgeEstado(estado: string): string {
     const badges: { [key: string]: string } = {
-      'pendiente': '🕒 Pendiente',
+      'pendiente': '🕐 Pendiente',
       'confirmada': '✅ Confirmada',
       'cancelada': '❌ Cancelada',
       'completada': '✔️ Completada',

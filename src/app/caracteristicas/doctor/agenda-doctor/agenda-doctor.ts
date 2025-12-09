@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-agenda',
@@ -14,10 +15,13 @@ import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
   templateUrl: './agenda-doctor.html',
   styleUrls: ['./agenda-doctor.css']
 })
-export class AgendaDoctor implements OnInit {
+export class AgendaDoctor implements OnInit, OnDestroy {
   private citasService = inject(CitasService);
   private authService = inject(AutenticacionService);
   private router = inject(Router);
+
+  // ← NUEVO: Suscripción para limpiar
+  private citasSubscription?: Subscription;
 
   citas: Cita[] = [];
   citasFiltradas: Cita[] = [];
@@ -31,20 +35,38 @@ export class AgendaDoctor implements OnInit {
   
   especialidades: string[] = [];
 
-  async ngOnInit() {
-    await this.cargarAgenda();
+  ngOnInit() {
+    this.cargarAgendaRealTime();
   }
 
-  async cargarAgenda() {
-    this.cargando = true;
+  ngOnDestroy() {
+    // ← IMPORTANTE: Limpiar suscripción
+    if (this.citasSubscription) {
+      this.citasSubscription.unsubscribe();
+    }
+  }
+
+  // ← NUEVO: Cargar agenda en tiempo real
+  cargarAgendaRealTime() {
     const uid = this.authService.obtenerUid();
     
     if (uid) {
-      this.citas = await this.citasService.obtenerCitasPorDoctor(uid);
-      this.citasFiltradas = [...this.citas];
-      this.extraerEspecialidades();
+      this.citasSubscription = this.citasService.obtenerCitasPorDoctorRealTime(uid)
+        .subscribe({
+          next: (citas) => {
+            console.log('✅ Agenda Doctor: Citas actualizadas en tiempo real:', citas.length);
+            this.citas = citas;
+            this.citasFiltradas = [...citas];
+            this.extraerEspecialidades();
+            this.aplicarFiltros(); // Reaplicar filtros automáticamente
+            this.cargando = false;
+          },
+          error: (error) => {
+            console.error('❌ Error al cargar agenda:', error);
+            this.cargando = false;
+          }
+        });
     }
-    this.cargando = false;
   }
 
   extraerEspecialidades() {
@@ -96,7 +118,10 @@ export class AgendaDoctor implements OnInit {
       if (accion === 'confirmar') {
         resultado = await this.citasService.confirmarCita(cita.id);
       } else if (accion === 'cancelar') {
-        if (!confirm('¿Rechazar esta cita?')) { this.procesandoId = null; return; }
+        if (!confirm('¿Rechazar esta cita?')) { 
+          this.procesandoId = null; 
+          return; 
+        }
         resultado = await this.citasService.cancelarCita(cita.id);
       } else if (accion === 'completar') {
         this.router.navigate(['/doctor/cita', cita.id]);
@@ -104,8 +129,8 @@ export class AgendaDoctor implements OnInit {
       }
 
       if (resultado && resultado.exito) {
-        await this.cargarAgenda();
-        this.aplicarFiltros();
+        // Ya no necesitamos recargar manualmente, el observable lo hace automáticamente
+        console.log('✅ Cita actualizada, el tiempo real refrescará los datos');
       }
     } catch (error) {
       console.error(error);
