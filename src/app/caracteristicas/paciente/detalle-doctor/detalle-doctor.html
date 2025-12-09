@@ -1,1 +1,127 @@
-<p>detalle-doctor works!</p>
+<app-navbar></app-navbar>
+
+<div class="contenedor-detalle">
+  
+  <!-- Botón Volver -->
+  <button class="btn-volver" (click)="volver()">
+    ← Volver a Doctores
+  </button>
+
+  <!-- Loader -->
+  <div *ngIf="cargando" class="cargando">
+    <div class="spinner"></div>
+    <p>Cargando información del doctor...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!cargando && errorCarga" class="mensaje-error">
+    <div class="error-icono">❌</div>
+    <h2>Doctor no encontrado</h2>
+    <p>No se pudo cargar la información del doctor</p>
+    <button class="btn-primary" (click)="volver()">Volver a la lista</button>
+  </div>
+
+  <!-- Detalle del Doctor -->
+  <div *ngIf="!cargando && !errorCarga && doctor && usuario" class="detalle-contenido">
+    
+    <!-- Tarjeta Principal -->
+    <div class="tarjeta-principal">
+      
+      <!-- Header con foto y datos básicos -->
+      <div class="header-doctor">
+        <div class="foto-container">
+          <img 
+            [src]="doctor.foto || 'https://via.placeholder.com/150/667eea/ffffff?text=Doctor'" 
+            [alt]="nombreCompleto"
+            class="foto-doctor"
+            (error)="onImageError($event)"
+          >
+        </div>
+        
+        <div class="info-basica">
+          <h1>{{ nombreCompleto }}</h1>
+          <p class="especialidad">
+            🩺 {{ doctor.especialidad }}
+          </p>
+          
+          <!-- Calificación -->
+          <div class="calificacion" *ngIf="doctor.calificacion">
+            <span 
+              *ngFor="let estrella of estrellas" 
+              [class.llena]="estrella === 1"
+              class="estrella"
+            >
+              {{ estrella === 1 ? '⭐' : '☆' }}
+            </span>
+            <span class="numero-calificacion">{{ doctor.calificacion }}/5</span>
+          </div>
+
+          <!-- Experiencia -->
+          <div class="experiencia">
+            <span class="icono">📅</span>
+            <span>{{ aniosExperiencia }} años de experiencia</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de contacto -->
+      <div class="seccion-info">
+        <h3>📞 Información de Contacto</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Email:</span>
+            <span class="valor">{{ usuario.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Teléfono:</span>
+            <span class="valor">{{ usuario.telefono }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Consultorio:</span>
+            <span class="valor">{{ doctor.consultorio }}</span>
+          </div>
+          <div class="info-item" *ngIf="doctor.numeroCitas">
+            <span class="label">Consultas realizadas:</span>
+            <span class="valor">{{ doctor.numeroCitas }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Biografía -->
+      <div class="seccion-info">
+        <h3>👨‍⚕️ Sobre el Doctor</h3>
+        <p class="biografia">{{ doctor.biografia }}</p>
+      </div>
+
+      <!-- Horarios de Atención -->
+      <div class="seccion-info">
+        <h3>🕐 Horarios de Atención</h3>
+        
+        <div *ngIf="obtenerDiasActivos().length === 0" class="sin-horarios">
+          <p>No hay horarios disponibles en este momento</p>
+        </div>
+
+        <div *ngIf="obtenerDiasActivos().length > 0" class="horarios-lista">
+          <div 
+            *ngFor="let dia of ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']" 
+            class="horario-item"
+            [class.activo]="obtenerDiasActivos().includes(dia)"
+          >
+            <span class="dia">{{ dia }}</span>
+            <span class="horas">{{ obtenerHorarioDia(dia) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de Acción -->
+      <div class="acciones">
+        <button class="btn-agendar" (click)="agendarCita()">
+          📅 Agendar Cita con este Doctor
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

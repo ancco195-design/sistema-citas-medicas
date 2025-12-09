@@ -1,0 +1,341 @@
+.contenedor-detalle {
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+/* Botón Volver */
+.btn-volver {
+  background: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #667eea;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-volver:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Loader */
+.cargando {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.cargando p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Mensaje de Error */
+.mensaje-error {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.error-icono {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.mensaje-error h2 {
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.mensaje-error p {
+  color: #666;
+  margin: 0 0 2rem 0;
+}
+
+/* Contenido Principal */
+.detalle-contenido {
+  max-width: 900px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tarjeta-principal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Header del Doctor */
+.header-doctor {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 3rem 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  color: white;
+}
+
+.foto-container {
+  flex-shrink: 0;
+}
+
+.foto-doctor {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.info-basica h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.especialidad {
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+  opacity: 0.95;
+}
+
+.calificacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.estrella {
+  font-size: 1.5rem;
+}
+
+.numero-calificacion {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.experiencia {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.experiencia .icono {
+  font-size: 1.3rem;
+}
+
+/* Secciones de Información */
+.seccion-info {
+  padding: 2rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.seccion-info:last-of-type {
+  border-bottom: none;
+}
+
+.seccion-info h3 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Grid de Información */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item .label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-item .valor {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Biografía */
+.biografia {
+  color: #555;
+  line-height: 1.7;
+  font-size: 1rem;
+  margin: 0;
+  text-align: justify;
+}
+
+/* Horarios */
+.sin-horarios {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+  font-style: italic;
+}
+
+.horarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.horario-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.horario-item.activo {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-left: 4px solid #667eea;
+}
+
+.horario-item:not(.activo) {
+  opacity: 0.5;
+}
+
+.horario-item .dia {
+  font-weight: 600;
+  color: #333;
+}
+
+.horario-item .horas {
+  color: #667eea;
+  font-weight: 500;
+}
+
+/* Acciones */
+.acciones {
+  padding: 2rem;
+  background: #f8f9fa;
+  text-align: center;
+}
+
+.btn-agendar,
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-agendar:hover,
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contenedor-detalle {
+    padding: 1rem;
+  }
+
+  .header-doctor {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .foto-doctor {
+    width: 120px;
+    height: 120px;
+  }
+
+  .info-basica h1 {
+    font-size: 1.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .seccion-info {
+    padding: 1.5rem;
+  }
+
+  .horario-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-volver {
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-agendar,
+  .btn-primary {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}

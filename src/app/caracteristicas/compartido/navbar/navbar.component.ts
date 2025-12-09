@@ -23,6 +23,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
+  // Cache estático para evitar recargas
+  private static usuarioCache: Usuario | null = null;
+  private static cacheIniciado = false;
+
   usuario: Usuario | null = null;
   mostrarMenuUsuario = false;
   mostrarMenuMovil = false;
@@ -31,7 +35,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   rolBadge = '';
 
   ngOnInit() {
-    this.cargarUsuario();
+    // Si ya hay datos en cache, usarlos inmediatamente
+    if (NavbarComponent.usuarioCache) {
+      this.aplicarDatosUsuario(NavbarComponent.usuarioCache);
+    } else if (!NavbarComponent.cacheIniciado) {
+      // Solo cargar si no se ha iniciado el cache
+      this.cargarUsuario();
+    }
 
     // Cerrar menús al navegar
     this.router.events.pipe(
@@ -49,21 +59,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Cargar datos del usuario actual
+   * Cargar datos del usuario actual (solo una vez)
    */
-  async cargarUsuario() {
-    const uid = this.autenticacionService.obtenerUid();
+  cargarUsuario() {
+    NavbarComponent.cacheIniciado = true;
     
+    const uid = this.autenticacionService.obtenerUid();
     if (uid) {
-      try {
-        const usuario = await this.usuariosService.obtenerUsuario(uid);
-        
+      this.usuariosService.obtenerUsuario(uid).then(usuario => {
         if (usuario) {
+          NavbarComponent.usuarioCache = usuario;
           this.aplicarDatosUsuario(usuario);
         }
-      } catch (error) {
-        console.error('Error al cargar usuario en navbar:', error);
-      }
+      });
     }
   }
 
@@ -142,6 +150,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
    * Cerrar sesión
    */
   async cerrarSesion() {
+    // Limpiar cache al cerrar sesión
+    NavbarComponent.usuarioCache = null;
+    NavbarComponent.cacheIniciado = false;
+    
     const resultado = await this.autenticacionService.cerrarSesion();
     if (resultado.exito) {
       this.router.navigate(['/autenticacion/inicio-sesion']);
