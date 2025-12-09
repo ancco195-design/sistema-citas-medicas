@@ -1,11 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, authState, User } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 import { RegistroUsuario, LoginUsuario } from '../modelos/usuario.model';
 
 /**
  * Servicio de Autenticación
  * Maneja el registro, login y logout de usuarios con Firebase Authentication
+ * 
+ * CORREGIDO: Ahora incluye un método para esperar a que Firebase
+ * cargue completamente el estado de autenticación
  */
 @Injectable({
   providedIn: 'root'
@@ -16,7 +20,30 @@ export class AutenticacionService {
   // Observable del estado de autenticación
   usuarioActual$: Observable<User | null> = authState(this.auth);
 
-  constructor() { }
+  constructor() {
+    // Log para debugging
+    this.usuarioActual$.subscribe(usuario => {
+      if (usuario) {
+        console.log('🔐 Auth Service: Usuario detectado', usuario.uid);
+      } else {
+        console.log('🔓 Auth Service: Sin usuario autenticado');
+      }
+    });
+  }
+
+  /**
+   * NUEVO: Obtener el estado de autenticación después de que Firebase lo haya cargado
+   * Este método espera a que Firebase emita al menos un valor (incluso si es null)
+   * Esto resuelve el problema de la redirección prematura en nuevas pestañas
+   * 
+   * @returns Observable que emite una vez que Firebase ha cargado el estado
+   */
+  obtenerEstadoAutenticacionCargado(): Observable<User | null> {
+    return this.usuarioActual$.pipe(
+      // Esperar al primer valor emitido (puede ser User o null)
+      take(1)
+    );
+  }
 
   /**
    * Registrar un nuevo usuario

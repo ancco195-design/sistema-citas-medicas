@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,6 +8,8 @@ import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 /**
  * Componente de Inicio de Sesión
  * Permite a los usuarios autenticarse en el sistema
+ * 
+ * ACTUALIZADO: Ahora verifica en ngOnInit si ya hay un usuario autenticado
  */
 @Component({
   selector: 'app-inicio-sesion',
@@ -16,7 +18,7 @@ import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
   templateUrl: './inicio-sesion.html',
   styleUrl: './inicio-sesion.css'
 })
-export class InicioSesionComponent {
+export class InicioSesionComponent implements OnInit {
   private fb = inject(FormBuilder);
   private autenticacionService = inject(AutenticacionService);
   private usuariosService = inject(UsuariosService);
@@ -32,6 +34,23 @@ export class InicioSesionComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  /**
+   * Verificar si ya hay un usuario autenticado al cargar el componente
+   */
+  async ngOnInit() {
+    // Verificación adicional por si el guard no funcionó
+    const usuario = this.autenticacionService.obtenerUsuarioActual();
+    
+    if (usuario) {
+      console.log('⚠️ Usuario ya autenticado detectado en Login, redirigiendo...');
+      const datosUsuario = await this.usuariosService.obtenerUsuario(usuario.uid);
+      
+      if (datosUsuario) {
+        this.redirigirSegunRol(datosUsuario.rol);
+      }
+    }
   }
 
   /**

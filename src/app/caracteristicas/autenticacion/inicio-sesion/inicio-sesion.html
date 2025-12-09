@@ -47,9 +47,10 @@
           <button 
             type="button" 
             class="btn-toggle-password"
+            [class.oculto]="!mostrarPassword"
             (click)="togglePassword()"
+            aria-label="Mostrar u ocultar contraseña"
           >
-            {{ mostrarPassword ? '👁️' : '👁️‍🗨️' }}
           </button>
         </div>
         <span 

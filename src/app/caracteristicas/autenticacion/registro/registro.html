@@ -181,13 +181,14 @@
             placeholder="••••••••"
             [class.error]="formularioRegistro.get('password')?.invalid && formularioRegistro.get('password')?.touched"
           >
-          <button 
-            type="button" 
-            class="btn-toggle-password"
-            (click)="togglePassword()"
-          >
-            {{ mostrarPassword ? '👁️' : '👁️‍🗨️' }}
-          </button>
+        <button 
+          type="button" 
+          class="btn-toggle-password"
+          [class.oculto]="!mostrarPassword"
+          (click)="togglePassword()"
+          aria-label="Mostrar u ocultar contraseña"
+        >
+        </button>
         </div>
         <span class="mensaje-error" *ngIf="formularioRegistro.get('password')?.invalid && formularioRegistro.get('password')?.touched">
           {{ obtenerMensajeError('password') }}

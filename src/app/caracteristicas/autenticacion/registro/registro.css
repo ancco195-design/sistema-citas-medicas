@@ -203,14 +203,38 @@
   border: none;
   font-size: 18px;
   cursor: pointer;
-  padding: 4px;
-  opacity: 0.5;
-  transition: opacity 0.2s;
+  padding: 6px;
+  opacity: 0.6;
+  transition: all 0.2s;
   border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-password::after {
+  content: '👁️';
+  font-size: 18px;
+}
+
+.btn-toggle-password.oculto::after {
+  position: relative;
+}
+
+.btn-toggle-password.oculto::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  background: #4a5568;
+  transform: rotate(-45deg);
+  z-index: 1;
 }
 
 .btn-toggle-password:hover {
-  opacity: 0.8;
+  opacity: 1;
   background: #f7fafc;
 }
 
