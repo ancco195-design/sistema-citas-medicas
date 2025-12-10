@@ -86,6 +86,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Obtener iniciales del usuario
+   */
+  obtenerIniciales(): string {
+    if (!this.usuario) return 'U';
+    return `${this.usuario.nombre.charAt(0)}${this.usuario.apellido.charAt(0)}`;
+  }
+
+  /**
    * Obtener enlaces del menú según el rol
    */
   obtenerEnlacesMenu(rol: string): any[] {
@@ -129,6 +137,25 @@ export class NavbarComponent implements OnInit, OnDestroy {
         return '👑 Administrador';
       default:
         return '';
+    }
+  }
+
+  /**
+   * Navegar al inicio según el rol
+   */
+  irAlInicio() {
+    if (!this.usuario) return;
+    
+    switch (this.usuario.rol) {
+      case 'paciente':
+        this.router.navigate(['/paciente/inicio']);
+        break;
+      case 'doctor':
+        this.router.navigate(['/doctor/inicio']);
+        break;
+      case 'admin':
+        this.router.navigate(['/admin/panel']);
+        break;
     }
   }
 

@@ -36,7 +36,7 @@ export const noAuthGuard: CanActivateFn = async (route, state) => {
             break;
           case 'doctor':
             console.log('👨‍⚕️ Redirigiendo a panel de doctor');
-            router.navigate(['/doctor/agenda']);
+            router.navigate(['/doctor/inicio']);
             break;
           case 'admin':
             console.log('🔧 Redirigiendo a panel de admin');

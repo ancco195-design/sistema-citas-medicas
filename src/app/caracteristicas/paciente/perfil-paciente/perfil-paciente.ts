@@ -26,6 +26,11 @@ export class PerfilPaciente implements OnInit {
   mensajeExito = '';
   mensajeError = '';
 
+  // Variables para foto
+  fotoSeleccionada: File | null = null;
+  fotoPreview: string | null = null;
+  subiendoFoto = false;
+
   constructor() {
     this.formularioPerfil = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -51,6 +56,11 @@ export class PerfilPaciente implements OnInit {
           apellido: this.usuario.apellido,
           telefono: this.usuario.telefono
         });
+        
+        // Cargar foto si existe
+        if (this.usuario.foto) {
+          this.fotoPreview = this.usuario.foto;
+        }
         
         // Deshabilitar el formulario inicialmente
         this.formularioPerfil.disable();
@@ -79,6 +89,10 @@ export class PerfilPaciente implements OnInit {
         apellido: this.usuario.apellido,
         telefono: this.usuario.telefono
       });
+      
+      // Restaurar foto
+      this.fotoPreview = this.usuario.foto || null;
+      this.fotoSeleccionada = null;
     }
     
     // Deshabilitar el formulario
@@ -122,6 +136,186 @@ export class PerfilPaciente implements OnInit {
     
     this.guardando = false;
   }
+
+  // ==================== MÉTODOS PARA FOTO ====================
+
+  /**
+   * Manejar selección de archivo
+   */
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validar archivo
+    const validacion = this.validarImagen(file);
+    if (!validacion.valido) {
+      this.mensajeError = validacion.mensaje;
+      setTimeout(() => this.mensajeError = '', 3000);
+      return;
+    }
+
+    this.fotoSeleccionada = file;
+    
+    // Crear preview
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.fotoPreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Subir foto de perfil
+   */
+  async subirFoto() {
+    if (!this.fotoSeleccionada) {
+      this.mensajeError = 'Por favor selecciona una imagen';
+      return;
+    }
+
+    this.subiendoFoto = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    const uid = this.autenticacionService.obtenerUid();
+    if (!uid) return;
+
+    try {
+      // Comprimir y convertir a Base64
+      const base64 = await this.comprimirImagen(this.fotoSeleccionada);
+      
+      // Guardar en Firestore
+      const resultado = await this.usuariosService.actualizarUsuario(uid, {
+        foto: base64
+      });
+
+      if (resultado.exito) {
+        this.mensajeExito = '¡Foto actualizada exitosamente!';
+        await this.cargarDatos();
+        this.fotoSeleccionada = null;
+        
+        setTimeout(() => {
+          this.mensajeExito = '';
+        }, 3000);
+      } else {
+        this.mensajeError = 'Error al guardar la foto';
+      }
+    } catch (error) {
+      console.error('Error al subir foto:', error);
+      this.mensajeError = 'Error al procesar la imagen';
+    }
+
+    this.subiendoFoto = false;
+  }
+
+  /**
+   * Eliminar foto de perfil
+   */
+  async eliminarFoto() {
+    if (!confirm('¿Estás seguro de eliminar tu foto de perfil?')) return;
+
+    this.subiendoFoto = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    const uid = this.autenticacionService.obtenerUid();
+    if (!uid) return;
+
+    try {
+      // Usar deleteField de Firestore o simplemente no enviar el campo
+      const resultado = await this.usuariosService.actualizarUsuario(uid, {
+        foto: '' // Enviamos string vacío en lugar de null
+      });
+
+      if (resultado.exito) {
+        this.mensajeExito = 'Foto eliminada exitosamente';
+        this.fotoPreview = null;
+        this.fotoSeleccionada = null;
+        await this.cargarDatos();
+        
+        setTimeout(() => {
+          this.mensajeExito = '';
+        }, 3000);
+      }
+    } catch (error) {
+      this.mensajeError = 'Error al eliminar la foto';
+    }
+
+    this.subiendoFoto = false;
+  }
+
+  /**
+   * Validar imagen
+   */
+  private validarImagen(file: File): { valido: boolean; mensaje: string } {
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!tiposPermitidos.includes(file.type)) {
+      return {
+        valido: false,
+        mensaje: 'Solo se permiten imágenes JPG, PNG o WEBP'
+      };
+    }
+
+    const tamañoMaximo = 2 * 1024 * 1024; // 2MB
+    if (file.size > tamañoMaximo) {
+      return {
+        valido: false,
+        mensaje: 'La imagen no debe superar los 2MB'
+      };
+    }
+
+    return { valido: true, mensaje: 'Imagen válida' };
+  }
+
+  /**
+   * Comprimir imagen a Base64
+   */
+  private async comprimirImagen(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e: any) => {
+        const img = new Image();
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 800;
+          const maxHeight = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          const base64 = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(base64);
+        };
+
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ==================== FIN MÉTODOS PARA FOTO ====================
 
   formatearFecha(fecha: any): string {
     if (!fecha) return 'No disponible';

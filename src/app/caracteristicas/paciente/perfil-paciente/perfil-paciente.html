@@ -29,14 +29,76 @@
 
       <!-- Avatar y Rol -->
       <div class="perfil-header">
-        <div class="avatar-grande">
+        <div class="avatar-grande" *ngIf="!fotoPreview || fotoPreview === ''">
           {{ usuario.nombre.charAt(0) }}{{ usuario.apellido.charAt(0) }}
         </div>
+        <img *ngIf="fotoPreview && fotoPreview !== ''" [src]="fotoPreview" alt="Foto de perfil" class="avatar-grande-foto">
+        
         <div class="perfil-info">
           <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
           <span class="badge-rol">👤 Paciente</span>
         </div>
       </div>
+
+      <!-- ==================== SECCIÓN DE FOTO ==================== -->
+      <div class="seccion-datos">
+        <h3>📸 Foto de Perfil</h3>
+        
+        <div class="contenedor-foto">
+          <div class="foto-preview-container">
+            <div *ngIf="!fotoPreview || fotoPreview === ''" class="foto-placeholder">
+              <span class="icono-foto">📷</span>
+              <p>Sin foto</p>
+            </div>
+            <img *ngIf="fotoPreview && fotoPreview !== ''" [src]="fotoPreview" alt="Preview" class="foto-preview">
+          </div>
+          
+          <div class="foto-controles">
+            <input 
+              type="file" 
+              #fileInput 
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              (change)="onFileSelected($event)"
+              style="display: none;"
+            >
+            
+            <button 
+              type="button"
+              class="btn-seleccionar-foto"
+              (click)="fileInput.click()"
+              [disabled]="subiendoFoto"
+            >
+              📁 Seleccionar Foto
+            </button>
+            
+            <button 
+              *ngIf="fotoSeleccionada"
+              type="button"
+              class="btn-subir-foto"
+              (click)="subirFoto()"
+              [disabled]="subiendoFoto"
+            >
+              <span *ngIf="!subiendoFoto">💾 Guardar Foto</span>
+              <span *ngIf="subiendoFoto">Subiendo...</span>
+            </button>
+            
+            <button 
+              *ngIf="usuario.foto && usuario.foto !== ''"
+              type="button"
+              class="btn-eliminar-foto"
+              (click)="eliminarFoto()"
+              [disabled]="subiendoFoto"
+            >
+              🗑️ Eliminar Foto
+            </button>
+          </div>
+          
+          <p class="foto-info">
+            ℹ️ Formatos: JPG, PNG, WEBP • Tamaño máximo: 2MB
+          </p>
+        </div>
+      </div>
+      <!-- ==================== FIN SECCIÓN DE FOTO ==================== -->
 
       <!-- Datos No Editables -->
       <div class="seccion-datos">

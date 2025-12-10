@@ -138,6 +138,16 @@
   flex-shrink: 0;
 }
 
+.avatar-grande-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  flex-shrink: 0;
+}
+
 .perfil-info h2 {
   margin: 0 0 0.5rem 0;
   color: #1a202c;
@@ -156,6 +166,122 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+/* ==================== FOTO DE PERFIL ==================== */
+.contenedor-foto {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.foto-preview-container {
+  display: flex;
+  justify-content: center;
+}
+
+.foto-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 3px dashed #94a3b8;
+}
+
+.foto-placeholder .icono-foto {
+  font-size: 3rem;
+}
+
+.foto-placeholder p {
+  color: #64748b;
+  font-weight: 600;
+  margin: 0;
+}
+
+.foto-preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.foto-controles {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-seleccionar-foto,
+.btn-subir-foto,
+.btn-eliminar-foto {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-seleccionar-foto {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-seleccionar-foto:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-subir-foto {
+  background: #10b981;
+  color: white;
+}
+
+.btn-subir-foto:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-eliminar-foto {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-eliminar-foto:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-seleccionar-foto:disabled,
+.btn-subir-foto:disabled,
+.btn-eliminar-foto:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.foto-info {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ==================== FIN FOTO DE PERFIL ==================== */
 
 /* Sección de Datos */
 .seccion-datos {
@@ -389,6 +515,11 @@
   .btn-editar {
     width: 100%;
   }
+
+  .foto-preview, .foto-placeholder {
+    width: 180px;
+    height: 180px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -404,7 +535,7 @@
     font-size: 1.75rem;
   }
 
-  .avatar-grande {
+  .avatar-grande, .avatar-grande-foto {
     width: 80px;
     height: 80px;
     font-size: 2rem;
@@ -416,5 +547,20 @@
 
   .dato-fila {
     padding: 0.875rem 1rem;
+  }
+
+  .foto-preview, .foto-placeholder {
+    width: 150px;
+    height: 150px;
+  }
+
+  .foto-controles {
+    flex-direction: column;
+  }
+
+  .btn-seleccionar-foto,
+  .btn-subir-foto,
+  .btn-eliminar-foto {
+    width: 100%;
   }
 }

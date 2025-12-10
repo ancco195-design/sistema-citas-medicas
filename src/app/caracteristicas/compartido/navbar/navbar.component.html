@@ -2,8 +2,8 @@
   <div class="navbar-contenedor">
     
     <!-- Logo y Título -->
-    <div class="navbar-marca">
-      <span class="navbar-icono">🏥</span>
+    <div class="navbar-marca" (click)="irAlInicio()">
+      <span class="navbar-icono"><img src="icono.ico" alt=""></span>
       <span class="navbar-titulo">Sistema de Citas Médicas</span>
     </div>
 
@@ -30,14 +30,22 @@
       </div>
 
       <!-- Botón de Usuario -->
-      <div class="usuario-dropdown">
+      <div class="usuario-dropdown" [class.mostrar]="mostrarMenuUsuario">
         <button 
           class="usuario-boton"
           (click)="toggleMenuUsuario()"
         >
-          <div class="usuario-avatar">
-            {{ usuario?.nombre?.charAt(0) || 'U' }}
+          <!-- Avatar con foto o iniciales - CORREGIDO -->
+          <div class="usuario-avatar" *ngIf="!usuario?.foto || usuario?.foto === ''">
+            {{ obtenerIniciales() }}
           </div>
+          <img 
+            *ngIf="usuario?.foto && usuario?.foto !== ''" 
+            [src]="usuario?.foto" 
+            alt="Foto de perfil" 
+            class="usuario-avatar-foto"
+          >
+          
           <span class="usuario-nombre">{{ nombreCompleto }}</span>
           <span class="usuario-flecha">▼</span>
         </button>
@@ -45,9 +53,17 @@
         <!-- Menú Desplegable -->
         <div class="dropdown-menu" *ngIf="mostrarMenuUsuario">
           <div class="dropdown-header">
-            <div class="dropdown-avatar">
-              {{ usuario?.nombre?.charAt(0) || 'U' }}
+            <!-- Avatar con foto o iniciales - CORREGIDO -->
+            <div class="dropdown-avatar" *ngIf="!usuario?.foto || usuario?.foto === ''">
+              {{ obtenerIniciales() }}
             </div>
+            <img 
+              *ngIf="usuario?.foto && usuario?.foto !== ''" 
+              [src]="usuario?.foto" 
+              alt="Foto de perfil" 
+              class="dropdown-avatar-foto"
+            >
+            
             <div class="dropdown-info">
               <p class="dropdown-nombre">{{ nombreCompleto }}</p>
               <p class="dropdown-email">{{ usuario?.email }}</p>

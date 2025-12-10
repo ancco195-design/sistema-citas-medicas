@@ -49,6 +49,18 @@
 .navbar-icono {
   font-size: 32px;
   animation: pulse 2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-icono img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(49, 130, 206, 0.3));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
 }
 
 @keyframes pulse {
@@ -67,7 +79,7 @@
   letter-spacing: -0.3px;
 }
 
-/* Menú de Navegación - MEJORADO */
+/* Menú de Navegación */
 .navbar-menu {
   display: flex;
   gap: 6px;
@@ -92,7 +104,6 @@
   overflow: hidden;
 }
 
-/* Efecto de fondo en hover */
 .navbar-enlace::before {
   content: '';
   position: absolute;
@@ -117,7 +128,7 @@
 }
 
 .navbar-enlace.activo {
-  background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
   transform: translateY(-1px);
@@ -154,7 +165,7 @@
   }
 }
 
-/* Usuario - MEJORADO */
+/* Usuario */
 .navbar-usuario {
   display: flex;
   align-items: center;
@@ -210,6 +221,7 @@
   box-shadow: 0 6px 16px rgba(49, 130, 206, 0.15);
 }
 
+/* ==================== AVATARES CON FOTO ==================== */
 .usuario-avatar {
   width: 38px;
   height: 38px;
@@ -226,9 +238,22 @@
   transition: transform 0.2s;
 }
 
-.usuario-boton:hover .usuario-avatar {
+.usuario-avatar-foto {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(49, 130, 206, 0.3);
+  transition: transform 0.2s;
+  border: 2px solid #3182ce;
+}
+
+.usuario-boton:hover .usuario-avatar,
+.usuario-boton:hover .usuario-avatar-foto {
   transform: scale(1.1);
 }
+/* ==================== FIN AVATARES CON FOTO ==================== */
 
 .usuario-nombre {
   font-weight: 600;
@@ -246,7 +271,7 @@
   transform: rotate(180deg);
 }
 
-/* Dropdown Menu - MEJORADO */
+/* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -282,6 +307,7 @@
   margin-bottom: 8px;
 }
 
+/* ==================== AVATAR DROPDOWN CON FOTO ==================== */
 .dropdown-avatar {
   width: 52px;
   height: 52px;
@@ -296,6 +322,17 @@
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
 }
+
+.dropdown-avatar-foto {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+  border: 3px solid #3182ce;
+}
+/* ==================== FIN AVATAR DROPDOWN CON FOTO ==================== */
 
 .dropdown-info {
   flex: 1;
@@ -393,7 +430,7 @@
   display: none;
 }
 
-/* Responsivo */
+/* Responsive */
 @media (min-width: 768px) {
   .navbar-titulo {
     display: block;
@@ -508,7 +545,7 @@
     padding: 6px 10px;
   }
 
-  .usuario-avatar {
+  .usuario-avatar, .usuario-avatar-foto {
     width: 34px;
     height: 34px;
     font-size: 13px;
