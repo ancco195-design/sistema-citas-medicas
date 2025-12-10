@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, CollectionReference, DocumentData } from '@angular/fire/firestore';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, Subject, BehaviorSubject } from 'rxjs';
 import { Usuario, RegistroUsuario, TipoRol } from '../modelos/usuario.model';
 
 /**
@@ -13,6 +13,11 @@ import { Usuario, RegistroUsuario, TipoRol } from '../modelos/usuario.model';
 export class UsuariosService {
   private firestore = inject(Firestore);
   private usuariosCollection: CollectionReference<DocumentData>;
+
+  // ==================== NUEVO: OBSERVABLE PARA CAMBIOS EN TIEMPO REAL ====================
+  private usuarioActualizadoSubject = new BehaviorSubject<Usuario | null>(null);
+  public usuarioActualizado$ = this.usuarioActualizadoSubject.asObservable();
+  // ==================== FIN NUEVO ====================
 
   constructor() {
     this.usuariosCollection = collection(this.firestore, 'usuarios');
@@ -33,7 +38,7 @@ export class UsuariosService {
         apellido: datos.apellido,
         telefono: datos.telefono,
         rol: datos.rol,
-        ...(datos.especialidad && { especialidad: datos.especialidad }),  // ← CAMBIO AQUÍ
+        ...(datos.especialidad && { especialidad: datos.especialidad }),
         fechaRegistro: new Date(),
         activo: true
       };
@@ -96,6 +101,16 @@ export class UsuariosService {
   async actualizarUsuario(uid: string, datos: Partial<Usuario>): Promise<any> {
     try {
       await updateDoc(doc(this.usuariosCollection, uid), datos);
+      
+      // ==================== NUEVO: NOTIFICAR CAMBIOS ====================
+      // Obtener usuario actualizado y notificar a todos los suscriptores
+      const usuarioActualizado = await this.obtenerUsuario(uid);
+      if (usuarioActualizado) {
+        this.usuarioActualizadoSubject.next(usuarioActualizado);
+        console.log('🔔 Usuario actualizado - notificando cambios', usuarioActualizado);
+      }
+      // ==================== FIN NUEVO ====================
+      
       return {
         exito: true,
         mensaje: 'Usuario actualizado exitosamente'

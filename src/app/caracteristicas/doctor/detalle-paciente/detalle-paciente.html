@@ -1,0 +1,90 @@
+<app-navbar></app-navbar>
+
+<div class="contenedor-detalle">
+  
+  <!-- Botón Volver -->
+  <button class="btn-volver" (click)="volver()">
+    ← Volver a Pacientes
+  </button>
+
+  <!-- Loader -->
+  <div *ngIf="cargando" class="cargando">
+    <div class="spinner"></div>
+    <p>Cargando historial...</p>
+  </div>
+
+  <!-- Contenido -->
+  <div *ngIf="!cargando && paciente" class="contenido">
+    
+    <!-- Header del Paciente -->
+    <div class="header-paciente">
+      <div *ngIf="!tieneFoto" class="avatar-grande">
+        {{ obtenerIniciales() }}
+      </div>
+      <img 
+        *ngIf="tieneFoto" 
+        [src]="paciente.foto" 
+        [alt]="nombreCompleto"
+        class="avatar-grande-foto"
+      >
+      
+      <div class="info-paciente">
+        <h1>{{ nombreCompleto }}</h1>
+        <p class="total-citas">📊 {{ citasPaciente.length }} {{ citasPaciente.length === 1 ? 'cita' : 'citas' }} registradas</p>
+      </div>
+    </div>
+
+    <!-- Historial de Citas -->
+    <div class="historial-citas">
+      <h2>📅 Historial de Citas</h2>
+      
+      <div *ngIf="citasPaciente.length === 0" class="sin-citas">
+        <p>No hay citas registradas con este paciente</p>
+      </div>
+
+      <div *ngIf="citasPaciente.length > 0" class="lista-citas">
+        <div *ngFor="let cita of citasPaciente" class="tarjeta-cita">
+          
+          <div class="cita-fecha">
+            <div class="fecha-icono">📅</div>
+            <div class="fecha-texto">
+              <strong>{{ convertirFecha(cita.fecha) | date:'fullDate' }}</strong>
+              <span class="hora">{{ cita.hora }}</span>
+            </div>
+          </div>
+
+          <div class="cita-detalles">
+            <div class="detalle-item">
+              <span class="label">Especialidad:</span>
+              <span class="valor">{{ cita.especialidad }}</span>
+            </div>
+            
+            <div class="detalle-item">
+              <span class="label">Motivo:</span>
+              <span class="valor">{{ cita.motivo }}</span>
+            </div>
+
+            <div class="detalle-item" *ngIf="cita.consultorio">
+              <span class="label">Consultorio:</span>
+              <span class="valor">{{ cita.consultorio }}</span>
+            </div>
+
+            <div class="detalle-item" *ngIf="cita.notas">
+              <span class="label">Notas:</span>
+              <span class="valor">{{ cita.notas }}</span>
+            </div>
+          </div>
+
+          <div class="cita-estado">
+            <span [class]="obtenerClaseEstado(cita.estado)">
+              {{ obtenerTextoEstado(cita.estado) }}
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

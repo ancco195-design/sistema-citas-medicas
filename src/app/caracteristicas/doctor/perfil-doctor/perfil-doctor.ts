@@ -32,6 +32,12 @@ export class PerfilDoctor implements OnInit {
   mensajeError = '';
   especialidades = ESPECIALIDADES_COMUNES;
 
+  // Variables para foto
+  fotoSeleccionada: File | null = null;
+  fotoPreview: string | null = null;
+  subiendoFoto = false;
+  mostrarModalEliminar = false; // ← NUEVO
+
   constructor() {
     this.formularioPerfil = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -70,6 +76,11 @@ export class PerfilDoctor implements OnInit {
           añosExperiencia: this.doctor.añosExperiencia
         });
         
+        // Cargar foto si existe
+        if (this.usuario.foto) {
+          this.fotoPreview = this.usuario.foto;
+        }
+        
         // Deshabilitar el formulario inicialmente
         this.formularioPerfil.disable();
       }
@@ -82,7 +93,7 @@ export class PerfilDoctor implements OnInit {
     this.modoEdicion = true;
     this.mensajeExito = '';
     this.mensajeError = '';
-    this.formularioPerfil.enable(); // Habilitar el formulario
+    this.formularioPerfil.enable();
   }
 
   cancelarEdicion() {
@@ -101,6 +112,10 @@ export class PerfilDoctor implements OnInit {
         biografia: this.doctor.biografia,
         añosExperiencia: this.doctor.añosExperiencia
       });
+      
+      // Restaurar foto
+      this.fotoPreview = this.usuario.foto || null;
+      this.fotoSeleccionada = null;
     }
     
     // Deshabilitar el formulario
@@ -123,7 +138,7 @@ export class PerfilDoctor implements OnInit {
       const datos = this.formularioPerfil.value;
       
       try {
-        // Actualizar datos de usuario (nombre, apellido, teléfono)
+        // Actualizar datos de usuario
         const resultadoUsuario = await this.usuariosService.actualizarUsuario(uid, {
           nombre: datos.nombre,
           apellido: datos.apellido,
@@ -158,6 +173,199 @@ export class PerfilDoctor implements OnInit {
     
     this.guardando = false;
   }
+
+  // ==================== MÉTODOS PARA FOTO ====================
+
+  /**
+   * Manejar selección de archivo
+   */
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validar archivo
+    const validacion = this.validarImagen(file);
+    if (!validacion.valido) {
+      this.mensajeError = validacion.mensaje;
+      setTimeout(() => this.mensajeError = '', 3000);
+      return;
+    }
+
+    this.fotoSeleccionada = file;
+    
+    // Crear preview
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.fotoPreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Subir foto de perfil
+   */
+  async subirFoto() {
+    if (!this.fotoSeleccionada) {
+      this.mensajeError = 'Por favor selecciona una imagen';
+      return;
+    }
+
+    this.subiendoFoto = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    const uid = this.autenticacionService.obtenerUid();
+    if (!uid) return;
+
+    try {
+      // Comprimir y convertir a Base64
+      const base64 = await this.comprimirImagen(this.fotoSeleccionada);
+      
+      // Guardar en Firestore
+      const resultado = await this.usuariosService.actualizarUsuario(uid, {
+        foto: base64
+      });
+
+      if (resultado.exito) {
+        this.mensajeExito = '¡Foto actualizada exitosamente!';
+        await this.cargarDatos();
+        this.fotoSeleccionada = null;
+        
+        setTimeout(() => {
+          this.mensajeExito = '';
+        }, 3000);
+      } else {
+        this.mensajeError = 'Error al guardar la foto';
+      }
+    } catch (error) {
+      console.error('Error al subir foto:', error);
+      this.mensajeError = 'Error al procesar la imagen';
+    }
+
+    this.subiendoFoto = false;
+  }
+
+  /**
+   * Eliminar foto de perfil
+   */
+  async eliminarFoto() {
+    // ← CAMBIADO: Ahora solo abre el modal
+    this.mostrarModalEliminar = true;
+  }
+
+  /**
+   * ← NUEVO: Confirmar eliminación
+   */
+  async confirmarEliminarFoto() {
+    this.mostrarModalEliminar = false;
+    this.subiendoFoto = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    const uid = this.autenticacionService.obtenerUid();
+    if (!uid) return;
+
+    try {
+      const resultado = await this.usuariosService.actualizarUsuario(uid, {
+        foto: ''
+      });
+
+      if (resultado.exito) {
+        this.mensajeExito = 'Foto eliminada exitosamente';
+        this.fotoPreview = null;
+        this.fotoSeleccionada = null;
+        await this.cargarDatos();
+        
+        setTimeout(() => {
+          this.mensajeExito = '';
+        }, 3000);
+      }
+    } catch (error) {
+      this.mensajeError = 'Error al eliminar la foto';
+    }
+
+    this.subiendoFoto = false;
+  }
+
+  /**
+   * ← NUEVO: Cancelar eliminación
+   */
+  cancelarEliminarFoto() {
+    this.mostrarModalEliminar = false;
+  }
+
+  /**
+   * Validar imagen
+   */
+  private validarImagen(file: File): { valido: boolean; mensaje: string } {
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!tiposPermitidos.includes(file.type)) {
+      return {
+        valido: false,
+        mensaje: 'Solo se permiten imágenes JPG, PNG o WEBP'
+      };
+    }
+
+    const tamañoMaximo = 2 * 1024 * 1024; // 2MB
+    if (file.size > tamañoMaximo) {
+      return {
+        valido: false,
+        mensaje: 'La imagen no debe superar los 2MB'
+      };
+    }
+
+    return { valido: true, mensaje: 'Imagen válida' };
+  }
+
+  /**
+   * Comprimir imagen a Base64
+   */
+  private async comprimirImagen(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e: any) => {
+        const img = new Image();
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 800;
+          const maxHeight = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          const base64 = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(base64);
+        };
+
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ==================== FIN MÉTODOS PARA FOTO ====================
 
   formatearFecha(fecha: any): string {
     if (!fecha) return 'No disponible';

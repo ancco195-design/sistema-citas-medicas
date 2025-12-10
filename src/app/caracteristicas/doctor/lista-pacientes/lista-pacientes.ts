@@ -1,7 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '../../compartido/navbar/navbar.component';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
+import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { Cita } from '../../../nucleo/modelos/cita.model';
 
@@ -11,6 +13,7 @@ interface PacienteResumen {
   nombre: string;
   ultimaCita: Date;
   totalCitas: number;
+  foto?: string; // ← NUEVO: Foto del paciente
 }
 
 @Component({
@@ -22,7 +25,9 @@ interface PacienteResumen {
 })
 export class ListaPacientes implements OnInit {
   private citasService = inject(CitasService);
+  private usuariosService = inject(UsuariosService);
   private authService = inject(AutenticacionService);
+  private router = inject(Router);
 
   pacientes: PacienteResumen[] = [];
   cargando = true;
@@ -34,7 +39,7 @@ export class ListaPacientes implements OnInit {
       try {
         // Obtenemos TODAS las citas históricas del doctor
         const citas = await this.citasService.obtenerCitasPorDoctor(uid);
-        this.agruparPacientes(citas);
+        await this.agruparPacientes(citas);
       } catch (error) {
         console.error('Error al cargar la lista de pacientes:', error);
       }
@@ -45,8 +50,9 @@ export class ListaPacientes implements OnInit {
   /**
    * Procesa las citas para extraer una lista de pacientes únicos
    * Calcula la fecha de la última visita y el total de citas por paciente
+   * ← ACTUALIZADO: Ahora también carga la foto de cada paciente
    */
-  agruparPacientes(citas: Cita[]) {
+  async agruparPacientes(citas: Cita[]) {
     const mapa = new Map<string, PacienteResumen>();
 
     citas.forEach(cita => {
@@ -67,7 +73,8 @@ export class ListaPacientes implements OnInit {
           id: cita.pacienteId,
           nombre: cita.pacienteNombre || 'Paciente Desconocido',
           ultimaCita: fechaCita,
-          totalCitas: 1
+          totalCitas: 1,
+          foto: undefined // Se cargará después
         });
       } else {
         // Si ya existe, actualizamos sus contadores
@@ -81,7 +88,56 @@ export class ListaPacientes implements OnInit {
       }
     });
 
-    // Convertimos el mapa a un array para usarlo en el *ngFor
+    // Convertimos el mapa a un array
     this.pacientes = Array.from(mapa.values());
+
+    // ==================== NUEVO: CARGAR FOTOS DE PACIENTES ====================
+    // Cargar la foto de cada paciente
+    await this.cargarFotosPacientes();
+    // ==================== FIN NUEVO ====================
+  }
+
+  /**
+   * ← NUEVO: Cargar fotos de todos los pacientes
+   */
+  async cargarFotosPacientes() {
+    const promesas = this.pacientes.map(async (paciente) => {
+      try {
+        const usuario = await this.usuariosService.obtenerUsuario(paciente.id);
+        if (usuario?.foto) {
+          paciente.foto = usuario.foto;
+        }
+      } catch (error) {
+        console.error(`Error al cargar foto del paciente ${paciente.id}:`, error);
+      }
+    });
+
+    // Esperar a que todas las fotos se carguen
+    await Promise.all(promesas);
+  }
+
+  /**
+   * ← NUEVO: Verificar si un paciente tiene foto
+   */
+  tieneFoto(paciente: PacienteResumen): boolean {
+    return !!paciente.foto && paciente.foto !== '';
+  }
+
+  /**
+   * ← NUEVO: Obtener iniciales del paciente
+   */
+  obtenerIniciales(nombre: string): string {
+    const partes = nombre.split(' ');
+    if (partes.length >= 2) {
+      return `${partes[0].charAt(0)}${partes[1].charAt(0)}`.toUpperCase();
+    }
+    return nombre.charAt(0).toUpperCase();
+  }
+
+  /**
+   * ← NUEVO: Ver historial del paciente
+   */
+  verHistorial(pacienteId: string) {
+    this.router.navigate(['/doctor/paciente', pacienteId]);
   }
 }

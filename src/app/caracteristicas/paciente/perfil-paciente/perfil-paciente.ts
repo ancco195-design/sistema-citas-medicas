@@ -30,6 +30,7 @@ export class PerfilPaciente implements OnInit {
   fotoSeleccionada: File | null = null;
   fotoPreview: string | null = null;
   subiendoFoto = false;
+  mostrarModalEliminar = false; // ← NUEVO
 
   constructor() {
     this.formularioPerfil = this.fb.group({
@@ -212,8 +213,15 @@ export class PerfilPaciente implements OnInit {
    * Eliminar foto de perfil
    */
   async eliminarFoto() {
-    if (!confirm('¿Estás seguro de eliminar tu foto de perfil?')) return;
+    // ← CAMBIADO: Ahora solo abre el modal
+    this.mostrarModalEliminar = true;
+  }
 
+  /**
+   * ← NUEVO: Confirmar eliminación
+   */
+  async confirmarEliminarFoto() {
+    this.mostrarModalEliminar = false;
     this.subiendoFoto = true;
     this.mensajeExito = '';
     this.mensajeError = '';
@@ -242,6 +250,13 @@ export class PerfilPaciente implements OnInit {
     }
 
     this.subiendoFoto = false;
+  }
+
+  /**
+   * ← NUEVO: Cancelar eliminación
+   */
+  cancelarEliminarFoto() {
+    this.mostrarModalEliminar = false;
   }
 
   /**

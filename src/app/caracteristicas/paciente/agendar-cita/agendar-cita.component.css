@@ -86,6 +86,7 @@
   margin-bottom: 25px;
 }
 
+/* ==================== AVATAR CON FOTO ==================== */
 .doctor-avatar {
   width: 70px;
   height: 70px;
@@ -97,7 +98,19 @@
   color: white;
   font-size: 24px;
   font-weight: 700;
+  flex-shrink: 0;
 }
+
+.doctor-avatar-foto {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  flex-shrink: 0;
+}
+/* ==================== FIN AVATAR CON FOTO ==================== */
 
 .doctor-datos h3 {
   margin: 0 0 8px 0;
@@ -284,7 +297,7 @@
 }
 
 .btn-agendar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #3b82f6 100%);
   color: white;
 }
 
@@ -320,5 +333,16 @@
   .info-doctor {
     flex-direction: column;
     text-align: center;
+  }
+
+  .doctor-avatar-foto {
+    width: 60px;
+    height: 60px;
+  }
+
+  .doctor-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
   }
 }

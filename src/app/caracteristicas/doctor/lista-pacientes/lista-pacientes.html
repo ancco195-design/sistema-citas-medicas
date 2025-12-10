@@ -23,10 +23,16 @@
   <div *ngIf="!cargando && pacientes.length > 0" class="grid-pacientes">
     <div *ngFor="let p of pacientes" class="card-paciente">
       
-      <!-- Avatar con la inicial -->
-      <div class="avatar">
-        {{ p.nombre.charAt(0) | uppercase }}
+      <!-- Avatar con foto o iniciales -->
+      <div *ngIf="!tieneFoto(p)" class="avatar">
+        {{ obtenerIniciales(p.nombre) }}
       </div>
+      <img 
+        *ngIf="tieneFoto(p)" 
+        [src]="p.foto" 
+        [alt]="p.nombre"
+        class="avatar-foto"
+      >
       
       <div class="info">
         <h3>{{ p.nombre }}</h3>
@@ -41,8 +47,8 @@
         </span>
       </div>
       
-      <!-- Botón de Acción (Futura implementación: Ver detalle completo del paciente) -->
-      <button class="btn-historial" title="Ver historial completo">
+      <!-- Botón de Acción -->
+      <button class="btn-historial" (click)="verHistorial(p.id)" title="Ver historial completo">
         Ver Historial
       </button>
 

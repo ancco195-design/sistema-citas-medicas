@@ -25,9 +25,17 @@
 
       <!-- Información del Doctor -->
       <div class="info-doctor" *ngIf="doctor && doctorUsuario">
-        <div class="doctor-avatar">
-          {{ doctorUsuario.nombre.charAt(0) }}{{ doctorUsuario.apellido.charAt(0) }}
+        <!-- Avatar con foto o iniciales -->
+        <div *ngIf="!tieneFotoDoctor" class="doctor-avatar">
+          {{ obtenerInicialesDoctor() }}
         </div>
+        <img 
+          *ngIf="tieneFotoDoctor" 
+          [src]="fotoDoctor" 
+          [alt]="nombreDoctor"
+          class="doctor-avatar-foto"
+        >
+        
         <div class="doctor-datos">
           <h3>{{ nombreDoctor }}</h3>
           <p class="especialidad">🩺 {{ doctor.especialidad }}</p>

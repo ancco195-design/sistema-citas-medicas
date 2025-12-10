@@ -218,6 +218,30 @@ export class AgendarCitaComponent implements OnInit {
     return '';
   }
 
+  // ==================== NUEVO: MÉTODOS PARA FOTO ====================
+  /**
+   * Obtener iniciales del doctor
+   */
+  obtenerInicialesDoctor(): string {
+    if (!this.doctorUsuario) return 'DR';
+    return `${this.doctorUsuario.nombre.charAt(0)}${this.doctorUsuario.apellido.charAt(0)}`.toUpperCase();
+  }
+
+  /**
+   * Verificar si el doctor tiene foto
+   */
+  get tieneFotoDoctor(): boolean {
+    return !!this.doctorUsuario?.foto && this.doctorUsuario.foto !== '';
+  }
+
+  /**
+   * Obtener foto del doctor
+   */
+  get fotoDoctor(): string | undefined {
+    return this.doctorUsuario?.foto;
+  }
+  // ==================== FIN NUEVO ====================
+
   /**
    * Obtener nombre completo del doctor
    */

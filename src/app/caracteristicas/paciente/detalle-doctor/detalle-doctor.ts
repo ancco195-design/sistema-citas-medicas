@@ -11,7 +11,7 @@ import { TelefonoPipe } from '../../../nucleo/pipes/telefono-pipe';
 @Component({
   selector: 'app-detalle-doctor',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, TelefonoPipe], // ← AGREGADO
+  imports: [CommonModule, NavbarComponent, TelefonoPipe],
   templateUrl: './detalle-doctor.html',
   styleUrl: './detalle-doctor.css'
 })
@@ -78,6 +78,17 @@ export class DetalleDoctor implements OnInit {
     return `${this.usuario.nombre.charAt(0)}${this.usuario.apellido.charAt(0)}`.toUpperCase();
   }
 
+  // ==================== NUEVO: Getter para foto ====================
+  get fotoDoctor(): string | undefined {
+    // La foto está en usuario.foto, no en doctor.foto
+    return this.usuario?.foto;
+  }
+
+  get tieneFoto(): boolean {
+    return !!this.usuario?.foto && this.usuario.foto !== '';
+  }
+  // ==================== FIN NUEVO ====================
+
   obtenerDiasActivos(): string[] {
     if (!this.doctor?.horarioDisponible) return [];
     
@@ -123,7 +134,8 @@ export class DetalleDoctor implements OnInit {
   onImageError(event: any) {
     if (!this.imagenError) {
       this.imagenError = true;
-      event.target.src = 'https://via.placeholder.com/150/667eea/ffffff?text=Doctor';
+      // Ocultar imagen y mostrar placeholder
+      event.target.style.display = 'none';
     }
   }
 }

@@ -211,3 +211,22 @@
 
   </div>
 </div>
+
+<!-- ==================== MODAL DE CONFIRMACIÓN ==================== -->
+<div *ngIf="mostrarModalEliminar" class="modal-overlay" (click)="cancelarEliminarFoto()">
+  <div class="modal-contenido" (click)="$event.stopPropagation()">
+    <div class="modal-icono">⚠️</div>
+    <h3 class="modal-titulo">Confirmar eliminación</h3>
+    <p class="modal-mensaje">¿Estás seguro de eliminar tu foto de perfil?</p>
+    
+    <div class="modal-botones">
+      <button class="modal-btn-cancelar" (click)="cancelarEliminarFoto()">
+        ❌ Cancelar
+      </button>
+      <button class="modal-btn-eliminar" (click)="confirmarEliminarFoto()">
+        🗑️ Eliminar
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ==================== FIN MODAL ==================== -->

@@ -42,7 +42,7 @@
   width: 50px;
   height: 50px;
   border: 4px solid #e2e8f0;
-  border-top-color: #3182ce;
+  border-top-color: #10b981;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 1rem;
@@ -138,6 +138,16 @@
   flex-shrink: 0;
 }
 
+.avatar-grande-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
+}
+
 .perfil-info h2 {
   margin: 0 0 0.5rem 0;
   color: #1a202c;
@@ -156,6 +166,122 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+/* ==================== FOTO DE PERFIL ==================== */
+.contenedor-foto {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.foto-preview-container {
+  display: flex;
+  justify-content: center;
+}
+
+.foto-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 3px dashed #6ee7b7;
+}
+
+.foto-placeholder .icono-foto {
+  font-size: 3rem;
+}
+
+.foto-placeholder p {
+  color: #047857;
+  font-weight: 600;
+  margin: 0;
+}
+
+.foto-preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.foto-controles {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-seleccionar-foto,
+.btn-subir-foto,
+.btn-eliminar-foto {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-seleccionar-foto {
+  background: #10b981;
+  color: white;
+}
+
+.btn-seleccionar-foto:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-subir-foto {
+  background: #0ea5e9;
+  color: white;
+}
+
+.btn-subir-foto:hover:not(:disabled) {
+  background: #0284c7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.btn-eliminar-foto {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-eliminar-foto:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-seleccionar-foto:disabled,
+.btn-subir-foto:disabled,
+.btn-eliminar-foto:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.foto-info {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ==================== FIN FOTO DE PERFIL ==================== */
 
 /* Sección de Datos */
 .seccion-datos {
@@ -405,6 +531,11 @@
   .btn-editar {
     width: 100%;
   }
+
+  .foto-preview, .foto-placeholder {
+    width: 180px;
+    height: 180px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -420,7 +551,7 @@
     font-size: 1.75rem;
   }
 
-  .avatar-grande {
+  .avatar-grande, .avatar-grande-foto {
     width: 80px;
     height: 80px;
     font-size: 2rem;
@@ -433,4 +564,151 @@
   .dato-fila {
     padding: 0.875rem 1rem;
   }
+
+  .foto-preview, .foto-placeholder {
+    width: 150px;
+    height: 150px;
+  }
+
+  .foto-controles {
+    flex-direction: column;
+  }
+
+  .btn-seleccionar-foto,
+  .btn-subir-foto,
+  .btn-eliminar-foto {
+    width: 100%;
+  }
 }
+
+/* ==================== MODAL DE CONFIRMACIÃ"N ==================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-contenido {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+  text-align: center;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-icono {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.modal-titulo {
+  margin: 0 0 1rem 0;
+  color: #1a202c;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.modal-mensaje {
+  margin: 0 0 2rem 0;
+  color: #718096;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.modal-botones {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-btn-cancelar,
+.modal-btn-eliminar {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-cancelar {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e0;
+}
+
+.modal-btn-cancelar:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-btn-eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.modal-btn-eliminar:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+@media (max-width: 480px) {
+  .modal-contenido {
+    padding: 1.5rem;
+  }
+
+  .modal-botones {
+    flex-direction: column;
+  }
+
+  .modal-btn-cancelar,
+  .modal-btn-eliminar {
+    width: 100%;
+  }
+}
+/* ==================== FIN MODAL ==================== */

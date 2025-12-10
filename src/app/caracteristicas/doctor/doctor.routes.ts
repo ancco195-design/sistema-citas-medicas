@@ -23,12 +23,19 @@ export const DOCTOR_ROUTES: Routes = [
           .then(m => m.AgendaDoctor),
         title: 'Mi Agenda'
       },
-      // 3. Lista de Pacientes (Historial)
+      // 3. Lista de Pacientes (Historial) ← ESTA ES LA QUE FALTABA
       { 
         path: 'pacientes', 
         loadComponent: () => import('./lista-pacientes/lista-pacientes')
           .then(m => m.ListaPacientes),
         title: 'Mis Pacientes'
+      },
+      // 3.1. Detalle de Paciente (Historial de citas)
+      { 
+        path: 'paciente/:id', 
+        loadComponent: () => import('./detalle-paciente/detalle-paciente')
+          .then(m => m.DetallePaciente),
+        title: 'Historial del Paciente'
       },
       // 4. Perfil del Doctor
       { 
