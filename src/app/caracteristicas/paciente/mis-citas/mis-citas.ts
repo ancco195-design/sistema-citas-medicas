@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { Cita, EstadoCita } from '../../../nucleo/modelos/cita.model';
@@ -13,8 +13,8 @@ import { TiempoRelativoPipe } from '../../../nucleo/pipes/tiempo-relativo-pipe';
   selector: 'app-mis-citas',
   standalone: true,
   imports: [CommonModule, NavbarComponent, FormsModule, TiempoRelativoPipe], // ← AGREGADO
-  templateUrl: './mis-citas.component.html',
-  styleUrl: './mis-citas.component.css'
+  templateUrl: './mis-citas.html',
+  styleUrl: './mis-citas.css'
 })
 export class MisCitasComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);

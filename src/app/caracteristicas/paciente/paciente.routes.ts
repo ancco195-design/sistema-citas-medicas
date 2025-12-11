@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { InicioPacienteComponent} from './inicio-paciente/inicio-paciente.component';
-import { ListaDoctoresComponent } from './lista-doctores/lista-doctores.component';
-import { AgendarCitaComponent } from './agendar-cita/agendar-cita.component';
-import { MisCitasComponent} from './mis-citas/mis-citas.component';      
+import { InicioPacienteComponent} from './inicio-paciente/inicio-paciente';
+import { ListaDoctoresComponent } from './lista-doctores/lista-doctores';
+import { AgendarCitaComponent } from './agendar-cita/agendar-cita';
+import { MisCitasComponent} from './mis-citas/mis-citas';      
 import { DetalleDoctor} from './detalle-doctor/detalle-doctor';
 
 /**

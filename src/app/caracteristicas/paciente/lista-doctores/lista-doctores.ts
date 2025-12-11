@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { Doctor } from '../../../nucleo/modelos/doctor.model';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
 import { ESPECIALIDADES_COMUNES } from '../../../nucleo/modelos/especialidad.model';
@@ -14,8 +14,8 @@ import { Subscription } from 'rxjs';
   selector: 'app-lista-doctores',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
-  templateUrl: './lista-doctores.component.html',
-  styleUrl: './lista-doctores.component.css'
+  templateUrl: './lista-doctores.html',
+  styleUrl: './lista-doctores.css'
 })
 export class ListaDoctoresComponent implements OnInit, OnDestroy {
   private doctoresService = inject(DoctoresService);

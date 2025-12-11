@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
@@ -18,8 +18,8 @@ import { Usuario } from '../../../nucleo/modelos/usuario.model';
   selector: 'app-agendar-cita',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
-  templateUrl: './agendar-cita.component.html',
-  styleUrl: './agendar-cita.component.css'
+  templateUrl: './agendar-cita.html',
+  styleUrl: './agendar-cita.css'
 })
 export class AgendarCitaComponent implements OnInit {
   private fb = inject(FormBuilder);

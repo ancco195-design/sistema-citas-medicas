@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // Vital para [(ngModel)]
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { Cita } from '../../../nucleo/modelos/cita.model';
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';

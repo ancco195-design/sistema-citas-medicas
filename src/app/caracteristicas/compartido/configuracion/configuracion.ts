@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { NavbarComponent } from '../navbar/navbar';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 

@@ -5,7 +5,7 @@ import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.se
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { Usuario } from '../../../nucleo/modelos/usuario.model';
 import { Cita } from '../../../nucleo/modelos/cita.model';
 import { Subscription } from 'rxjs';
@@ -14,8 +14,8 @@ import { Subscription } from 'rxjs';
   selector: 'app-inicio-paciente',
   standalone: true,
   imports: [CommonModule, RouterLink, NavbarComponent],
-  templateUrl: './inicio-paciente.component.html',
-  styleUrl: './inicio-paciente.component.css'
+  templateUrl: './inicio-paciente.html',
+  styleUrl: './inicio-paciente.css'
 })
 export class InicioPacienteComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);

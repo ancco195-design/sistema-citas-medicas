@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { DoctoresService } from '../../../nucleo/servicios/doctores.service';
 import { Cita } from '../../../nucleo/modelos/cita.model';

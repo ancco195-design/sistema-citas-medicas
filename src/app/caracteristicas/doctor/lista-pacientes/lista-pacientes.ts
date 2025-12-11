@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NavbarComponent } from '../../compartido/navbar/navbar.component';
+import { NavbarComponent } from '../../compartido/navbar/navbar';
 import { CitasService } from '../../../nucleo/servicios/citas.service';
 import { UsuariosService } from '../../../nucleo/servicios/usuarios.service';
 import { AutenticacionService } from '../../../nucleo/servicios/autenticacion.service';

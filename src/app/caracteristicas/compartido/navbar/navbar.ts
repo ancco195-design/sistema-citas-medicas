@@ -14,8 +14,8 @@ import { Subject, takeUntil, filter } from 'rxjs';
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  templateUrl: './navbar.html',
+  styleUrl: './navbar.css'
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   private autenticacionService = inject(AutenticacionService);
