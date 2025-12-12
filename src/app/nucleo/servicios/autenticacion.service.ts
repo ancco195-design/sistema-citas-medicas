@@ -24,7 +24,7 @@ export class AutenticacionService {
     // Log para debugging
     this.usuarioActual$.subscribe(usuario => {
       if (usuario) {
-        console.log('🔐 Auth Service: Usuario detectado', usuario.uid);
+        console.log('🔐 Auth Service: Usuario detectado');
       } else {
         console.log('🔓 Auth Service: Sin usuario autenticado');
       }

@@ -139,10 +139,13 @@ src/app/
 - **tiempo-relativo-pipe.ts** - Conversión de fechas relativas
 
 ## URLs de Despliegue
-
-- **Aplicación desplegada:** 
+- **Aplicación desplegada:** https://sistema-citas-medicas-365f8.web.app/
+- **Hosting:** Firebase Hosting
 
 ## Video Demostrativo
+
+https://youtu.be/kWI332nOx6g
+
 
 **URL del video:** 
 
@@ -283,7 +286,7 @@ Para reportar problemas o sugerencias, crear un issue en el repositorio de GitHu
 
 ---
 
-**Desarrollado por:** Juan David
+**Desarrollado por:** Juan David Ancco Hurtado
 **Materia:** Desarrollo de Aplicaciones Web  
 **Docente:** Iván Soria Solís  
 **Año:** 2024

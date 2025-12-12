@@ -107,7 +107,7 @@ export class UsuariosService {
       const usuarioActualizado = await this.obtenerUsuario(uid);
       if (usuarioActualizado) {
         this.usuarioActualizadoSubject.next(usuarioActualizado);
-        console.log('🔔 Usuario actualizado - notificando cambios', usuarioActualizado);
+        console.log('🔔 Usuario actualizado - notificando cambios');
       }
       // ==================== FIN NUEVO ====================
       

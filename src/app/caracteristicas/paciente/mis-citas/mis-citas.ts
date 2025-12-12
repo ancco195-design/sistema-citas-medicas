@@ -65,7 +65,7 @@ export class MisCitasComponent implements OnInit, OnDestroy {
     this.citasSubscription = this.citasService.obtenerCitasPorPacienteRealTime(uid)
       .subscribe({
         next: (citas) => {
-          console.log('✅ Mis Citas: Citas actualizadas en tiempo real:', citas.length);
+          console.log('✅ Mis Citas: Citas actualizadas en tiempo real:');
           this.citas = citas;
           this.aplicarFiltroYOrdenamiento();
           this.cargando = false;

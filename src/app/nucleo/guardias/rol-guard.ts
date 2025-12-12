@@ -47,7 +47,6 @@ export const rolGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, sta
     if (rolesPermitidos.includes(datosUsuario.rol)) {
       return true;
     } else {
-      console.log(`Acceso denegado. Rol requerido: ${rolesPermitidos.join(', ')}. Rol del usuario: ${datosUsuario.rol}`);
       
       // Redirigir según el rol del usuario
       switch (datosUsuario.rol) {
